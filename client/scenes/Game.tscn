@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://b7st014v8xw5i"]
+
+[ext_resource type="Script" uid="uid://h1vmlyjclvni" path="res://scripts/Game.gd" id="1"]
+
+[node name="Game" type="Control" unique_id=416368753]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="MainVBox" type="VBoxContainer" parent="." unique_id=920923692]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="InfoLabel" type="Label" parent="MainVBox" unique_id=1144308397]
+layout_mode = 2
+text = "Game"
+
+[node name="HintLabel" type="Label" parent="MainVBox" unique_id=1907644855]
+layout_mode = 2
+text = "Hint:"
+
+[node name="HintInput" type="LineEdit" parent="MainVBox" unique_id=264695097]
+layout_mode = 2
+placeholder_text = "Unesi hint"
+
+[node name="SendHintButton" type="Button" parent="MainVBox" unique_id=492907058]
+layout_mode = 2
+text = "Send Hint"
+
+[node name="ScoreContainer" type="VBoxContainer" parent="MainVBox" unique_id=1050655205]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="MainVBox" unique_id=205830107]
+layout_mode = 2
+columns = 30
+
+[connection signal="pressed" from="MainVBox/SendHintButton" to="." method="_on_send_hint_button_pressed"]
