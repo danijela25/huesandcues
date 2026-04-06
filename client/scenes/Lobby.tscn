@@ -11,38 +11,60 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="MainMargin" type="MarginContainer" parent="."]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -180.0
-offset_top = -150.0
-offset_right = 180.0
-offset_bottom = 150.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 40.0
+offset_right = -40.0
+offset_bottom = -40.0
 
-[node name="RoomCodeLabel" type="Label" parent="VBoxContainer"]
+[node name="VBox" type="VBoxContainer" parent="MainMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="MainMargin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Lobby"
+
+[node name="PlayerNameLabel" type="Label" parent="MainMargin/VBox"]
+layout_mode = 2
+text = "Ti si:"
+
+[node name="RoomCodeLabel" type="Label" parent="MainMargin/VBox"]
 layout_mode = 2
 text = "Kod sobe:"
 
-[node name="PlayersContainer" type="VBoxContainer" parent="VBoxContainer"]
+[node name="HostLabel" type="Label" parent="MainMargin/VBox"]
 layout_mode = 2
+text = "Host:"
 
-[node name="ReadyButton" type="Button" parent="VBoxContainer"]
+[node name="PlayersTitle" type="Label" parent="MainMargin/VBox"]
+layout_mode = 2
+text = "Igrači:"
+
+[node name="PlayersContainer" type="VBoxContainer" parent="MainMargin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ButtonsHBox" type="HBoxContainer" parent="MainMargin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ReadyButton" type="Button" parent="MainMargin/VBox/ButtonsHBox"]
 layout_mode = 2
 text = "Ready"
 
-[node name="StartButton" type="Button" parent="VBoxContainer"]
+[node name="StartButton" type="Button" parent="MainMargin/VBox/ButtonsHBox"]
 layout_mode = 2
 text = "Start Game"
 
-[node name="StatusLabel" type="Label" parent="VBoxContainer"]
+[node name="StatusLabel" type="Label" parent="MainMargin/VBox"]
 layout_mode = 2
-text = "Cekanje igraca..."
+text = "Čekanje igrača..."
 
-[connection signal="pressed" from="VBoxContainer/ReadyButton" to="." method="_on_ready_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="MainMargin/VBox/ButtonsHBox/ReadyButton" to="." method="_on_ready_button_pressed"]
+[connection signal="pressed" from="MainMargin/VBox/ButtonsHBox/StartButton" to="." method="_on_start_button_pressed"]

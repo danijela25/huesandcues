@@ -1,7 +1,20 @@
 const WebSocket = require("ws");
 const crypto = require("crypto");
+
 const wss = new WebSocket.Server({ port: 3000 });
 const rooms = {};
+
+const MIN_PLAYERS = 2;
+const MAX_PLAYERS = 6;
+const ROW_LETTERS = "ABCDEFGHIJKLMNOP";
+
+function send(ws, data) {
+  if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(data));
+}
+
+function broadcast(room, data) {
+  room.players.forEach((p) => send(p.ws, data));
+}
 
 function generateRoomCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -10,18 +23,56 @@ function generateRoomCode() {
   return rooms[code] ? generateRoomCode() : code;
 }
 
-function send(ws, data) {
-  if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(data));
+function playerView(player) {
+  return { id: player.id, name: player.name, ready: player.ready, score: player.score };
 }
 
-function broadcastToRoom(roomCode, data) {
-  const room = rooms[roomCode];
-  if (!room) return;
-  room.players.forEach((player) => send(player.ws, data));
+function tileCode(x, y) {
+  return `${ROW_LETTERS[y]}${x + 1}`;
 }
 
-function canStart(room) {
-  return room.players.length >= 2 && room.players.every((p) => p.ready);
+function hsvToRgb(h, s, v) {
+  let r, g, b;
+  const i = Math.floor(h * 6);
+  const f = h * 6 - i;
+  const p = v * (1 - s);
+  const q = v * (1 - f * s);
+  const t = v * (1 - (1 - f) * s);
+  switch (i % 6) {
+    case 0: r = v; g = t; b = p; break;
+    case 1: r = q; g = v; b = p; break;
+    case 2: r = p; g = v; b = t; break;
+    case 3: r = p; g = q; b = v; break;
+    case 4: r = t; g = p; b = v; break;
+    case 5: r = v; g = p; b = q; break;
+  }
+  return { r, g, b };
+}
+
+function tileColor(x, y) {
+  const hue = x / 30.0;
+  let saturation = 0.95;
+  let value = 1.0 - (y / 40.0);
+  if (value < 0.72) value = 0.72;
+  return hsvToRgb(hue, saturation, value);
+}
+
+function phaseLabel(phase) {
+  switch (phase) {
+    case "first_hint": return "Prvi hint";
+    case "first_guess": return "Prvo pogađanje";
+    case "second_hint": return "Drugi hint";
+    case "second_guess": return "Drugo pogađanje";
+    case "round_result": return "Rezultat runde";
+    default: return phase;
+  }
+}
+
+function validHintForPhase(hint, phase) {
+  const words = hint.trim().split(/\s+/).filter(Boolean);
+  if (phase === "first_hint") return words.length === 1;
+  if (phase === "second_hint") return words.length === 2;
+  return false;
 }
 
 function getLobbyState(room) {
@@ -29,9 +80,146 @@ function getLobbyState(room) {
     type: "lobby_state",
     roomCode: room.code,
     hostId: room.hostId,
-    canStart: canStart(room),
-    players: room.players.map((p) => ({ id: p.id, name: p.name, ready: p.ready, score: p.score })),
+    canStart: room.players.length >= MIN_PLAYERS && room.players.every((p) => p.ready),
+    players: room.players.map(playerView),
   };
+}
+
+function buildGuessOrder(room, reverse=false) {
+  const arr = room.players.filter((p) => p.id !== room.players[room.cueGiverIndex].id).map((p) => p.id);
+  return reverse ? arr.reverse() : arr;
+}
+
+function currentGuesser(room) {
+  if (!room.guessOrder || room.currentGuesserIndex == null) return null;
+  const id = room.guessOrder[room.currentGuesserIndex];
+  return room.players.find((p) => p.id === id) || null;
+}
+
+function startNewGame(room) {
+  room.status = "playing";
+  room.roundNumber = 1;
+  room.maxRounds = room.players.length * 2;
+  room.cueGiverIndex = 0;
+  startRound(room);
+}
+
+function resetForReplay(room) {
+  room.players.forEach((p) => {
+    p.score = 0;
+    p.ready = true;
+  });
+  room.roundNumber = 1;
+  room.cueGiverIndex = 0;
+  startRound(room);
+}
+
+function startRound(room) {
+  room.status = "playing";
+  room.phase = "first_hint";
+  room.currentHint = "";
+  room.guessesFirst = {};
+  room.guessesSecond = {};
+  room.guessOrder = buildGuessOrder(room, false);
+  room.currentGuesserIndex = 0;
+  room.secretTile = { x: Math.floor(Math.random() * 30), y: Math.floor(Math.random() * 16) };
+  const cueGiver = room.players[room.cueGiverIndex];
+
+  broadcast(room, {
+    type: "game_start",
+    roundNumber: room.roundNumber,
+    phaseLabel: phaseLabel(room.phase),
+    cueGiverId: cueGiver.id,
+    currentGuesserId: "",
+    currentGuesserName: "",
+    players: room.players.map(playerView),
+  });
+
+  send(cueGiver.ws, {
+    type: "secret_tile",
+    tileX: room.secretTile.x,
+    tileY: room.secretTile.y,
+    tileCode: tileCode(room.secretTile.x, room.secretTile.y),
+    color: tileColor(room.secretTile.x, room.secretTile.y),
+  });
+
+  broadcastState(room);
+}
+
+function broadcastState(room) {
+  const guesses = [];
+  const source = room.phase === "second_guess" ? room.guessesSecond : room.guessesFirst;
+  Object.values(source).forEach((g) => guesses.push(g));
+
+  const activeGuesser = currentGuesser(room);
+
+  broadcast(room, {
+    type: "state_update",
+    roundNumber: room.roundNumber,
+    phaseLabel: phaseLabel(room.phase),
+    cueGiverId: room.players[room.cueGiverIndex].id,
+    currentGuesserId: activeGuesser ? activeGuesser.id : "",
+    currentGuesserName: activeGuesser ? activeGuesser.name : "",
+    hint: room.currentHint,
+    players: room.players.map(playerView),
+    guesses,
+  });
+}
+
+function distance(a, b) {
+  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}
+
+function pointsForGuess(guess, secret) {
+  const d = distance(guess, secret);
+  if (d === 0) return 3;
+  if (d <= 2) return 2;
+  if (d <= 4) return 1;
+  return 0;
+}
+
+function finishRound(room) {
+  room.status = "round_result";
+  room.phase = "round_result";
+  const roundScores = [];
+  const cueGiver = room.players[room.cueGiverIndex];
+
+  room.players.forEach((player) => {
+    if (player.id === cueGiver.id) return;
+    const first = room.guessesFirst[player.id];
+    const second = room.guessesSecond[player.id] || first;
+    const guess = second || first;
+    const delta = guess ? pointsForGuess({ x: guess.x, y: guess.y }, room.secretTile) : 0;
+    player.score += delta;
+    roundScores.push({ name: player.name, delta });
+    if (delta >= 2) cueGiver.score += 1;
+  });
+
+  const nextIndex = (room.cueGiverIndex + 1) % room.players.length;
+  room.nextCueGiverIndex = nextIndex;
+  const nextCue = room.players[nextIndex];
+
+  broadcast(room, {
+    type: "round_result",
+    correctTile: {
+      x: room.secretTile.x,
+      y: room.secretTile.y,
+      code: tileCode(room.secretTile.x, room.secretTile.y),
+      color: tileColor(room.secretTile.x, room.secretTile.y),
+    },
+    players: room.players.map(playerView),
+    roundScores,
+    nextCueGiverId: nextCue.id,
+    nextCueGiverName: nextCue.name,
+  });
+
+  if (room.roundNumber >= room.maxRounds) {
+    room.status = "finished";
+    broadcast(room, {
+      type: "game_over",
+      players: room.players.map(playerView).sort((a, b) => b.score - a.score),
+    });
+  }
 }
 
 wss.on("connection", (ws) => {
@@ -39,75 +227,118 @@ wss.on("connection", (ws) => {
   ws.roomCode = null;
 
   ws.on("message", (message) => {
-    let data;
+    let data = null;
     try { data = JSON.parse(message.toString()); } catch { return; }
 
     if (data.type === "create_room") {
       const code = generateRoomCode();
-      rooms[code] = {
-        code, hostId: ws.playerId, status: "lobby",
-        players: [{ id: ws.playerId, name: data.playerName || "Igrac", ready: false, score: 0, ws }]
+      const room = {
+        code,
+        hostId: ws.playerId,
+        status: "lobby",
+        players: [{ id: ws.playerId, name: data.playerName || "Igrač", ready: false, score: 0, ws }],
       };
+      rooms[code] = room;
       ws.roomCode = code;
       send(ws, { type: "room_created", roomCode: code, playerId: ws.playerId });
-      broadcastToRoom(code, getLobbyState(rooms[code]));
+      broadcast(room, getLobbyState(room));
+      return;
     }
 
     if (data.type === "join_room") {
       const room = rooms[data.roomCode];
-      if (!room) return send(ws, { type: "error", message: "Soba nije pronadjena" });
-      if (room.status !== "lobby") return send(ws, { type: "error", message: "Igra je vec pocela" });
-      if (room.players.length >= 6) return send(ws, { type: "error", message: "Soba je puna" });
-      room.players.push({ id: ws.playerId, name: data.playerName || "Igrac", ready: false, score: 0, ws });
+      if (!room) return send(ws, { type: "error", message: "Soba nije pronađena" });
+      if (room.status !== "lobby") return send(ws, { type: "error", message: "Igra je već počela" });
+      if (room.players.length >= MAX_PLAYERS) return send(ws, { type: "error", message: "Soba je puna" });
+      room.players.push({ id: ws.playerId, name: data.playerName || "Igrač", ready: false, score: 0, ws });
       ws.roomCode = room.code;
-      broadcastToRoom(room.code, getLobbyState(room));
+      send(ws, { type: "joined_room", roomCode: room.code, playerId: ws.playerId });
+      broadcast(room, getLobbyState(room));
+      return;
     }
 
+    const room = rooms[ws.roomCode];
+    if (!room) return;
+
     if (data.type === "player_ready") {
-      const room = rooms[ws.roomCode];
-      if (!room) return;
       const player = room.players.find((p) => p.id === ws.playerId);
       if (!player) return;
       player.ready = !!data.ready;
-      broadcastToRoom(room.code, getLobbyState(room));
+      broadcast(room, getLobbyState(room));
+      return;
     }
 
     if (data.type === "start_game") {
-      const room = rooms[ws.roomCode];
-      if (!room) return;
       if (room.hostId !== ws.playerId) return;
-      if (!canStart(room)) return send(ws, { type: "error", message: "Nisu svi spremni" });
-
-      room.status = "playing";
-      room.cueGiverIndex = 0;
-      room.secretTile = { x: Math.floor(Math.random() * 30), y: Math.floor(Math.random() * 16) };
-
-      broadcastToRoom(room.code, {
-        type: "game_start",
-        cueGiverId: room.players[0].id,
-        players: room.players.map((p) => ({ id: p.id, name: p.name, score: p.score })),
-      });
-
-      send(room.players[0].ws, { type: "secret_tile", tileX: room.secretTile.x, tileY: room.secretTile.y });
+      if (!(room.players.length >= MIN_PLAYERS && room.players.every((p) => p.ready))) {
+        return send(ws, { type: "error", message: "Nema dovoljno igrača ili nisu svi ready" });
+      }
+      startNewGame(room);
+      return;
     }
 
+    if (data.type === "restart_game") {
+      if (room.status !== "finished") return;
+      resetForReplay(room);
+      return;
+    }
+
+    if (data.type === "next_round_ready") {
+      if (room.status !== "round_result") return;
+      const nextCue = room.players[room.nextCueGiverIndex];
+      if (!nextCue || nextCue.id !== ws.playerId) return;
+      if (room.roundNumber >= room.maxRounds) return;
+      room.roundNumber += 1;
+      room.cueGiverIndex = room.nextCueGiverIndex;
+      startRound(room);
+      return;
+    }
+
+    if (room.status !== "playing") return;
+    const cueGiver = room.players[room.cueGiverIndex];
+
     if (data.type === "submit_hint") {
-      const room = rooms[ws.roomCode];
-      if (!room) return;
-      const cueGiver = room.players[room.cueGiverIndex];
-      if (!cueGiver || cueGiver.id !== ws.playerId) return;
-      broadcastToRoom(room.code, { type: "new_hint", hint: data.hint || "" });
+      if (ws.playerId !== cueGiver.id) return;
+      if (!(room.phase === "first_hint" || room.phase === "second_hint")) return;
+      room.currentHint = (data.hint || "").trim();
+      if (room.currentHint === "") return;
+      if (!validHintForPhase(room.currentHint, room.phase)) {
+        return send(ws, { type: "error", message: room.phase === "first_hint" ? "Prvi hint mora imati tačno jednu reč." : "Drugi hint mora imati tačno dve reči." });
+      }
+      room.currentGuesserIndex = 0;
+      if (room.phase === "first_hint") {
+        room.guessOrder = buildGuessOrder(room, false);
+        room.phase = "first_guess";
+      } else {
+        room.guessOrder = buildGuessOrder(room, true);
+        room.phase = "second_guess";
+      }
+      broadcastState(room);
+      return;
     }
 
     if (data.type === "select_tile") {
-      const room = rooms[ws.roomCode];
-      if (!room) return;
-      broadcastToRoom(room.code, {
-        type: "tile_selected",
-        playerId: ws.playerId,
-        tileX: data.tileX,
-        tileY: data.tileY,
-      });
+      if (ws.playerId === cueGiver.id) return;
+      if (!(room.phase === "first_guess" || room.phase === "second_guess")) return;
+      const activeGuesser = currentGuesser(room);
+      if (!activeGuesser || activeGuesser.id !== ws.playerId) return;
+      const player = room.players.find((p) => p.id === ws.playerId);
+      if (!player) return;
+      const guess = { playerId: player.id, name: player.name, x: Number(data.tileX), y: Number(data.tileY) };
+      if (room.phase === "first_guess") {
+        room.guessesFirst[player.id] = guess;
+        room.currentGuesserIndex += 1;
+        if (room.currentGuesserIndex >= room.guessOrder.length) room.phase = "second_hint";
+      } else {
+        room.guessesSecond[player.id] = guess;
+        room.currentGuesserIndex += 1;
+        if (room.currentGuesserIndex >= room.guessOrder.length) {
+          finishRound(room);
+          return;
+        }
+      }
+      broadcastState(room);
+      return;
     }
   });
 
@@ -115,9 +346,12 @@ wss.on("connection", (ws) => {
     const room = rooms[ws.roomCode];
     if (!room) return;
     room.players = room.players.filter((p) => p.id !== ws.playerId);
-    if (room.players.length === 0) return delete rooms[ws.roomCode];
+    if (room.players.length === 0) {
+      delete rooms[ws.roomCode];
+      return;
+    }
     if (room.hostId === ws.playerId) room.hostId = room.players[0].id;
-    broadcastToRoom(room.code, getLobbyState(room));
+    broadcast(room, getLobbyState(room));
   });
 });
 

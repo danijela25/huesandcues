@@ -6,23 +6,24 @@ signal room_created(data)
 signal lobby_updated(data)
 signal game_started(data)
 signal secret_tile_received(data)
-signal hint_received(data)
-signal tile_selected(data)
+signal state_updated(data)
+signal round_result_received(data)
+signal game_over_received(data)
 signal error_received(message)
 
 var socket := WebSocketPeer.new()
-var connected_flag := false
 var server_url := "ws://127.0.0.1:3000"
+var connected_flag := false
 
 func _process(_delta):
 	if socket.get_ready_state() != WebSocketPeer.STATE_CLOSED:
 		socket.poll()
 
-	if socket.get_ready_state() == WebSocketPeer.STATE_OPEN and not is_connected:
+	if socket.get_ready_state() == WebSocketPeer.STATE_OPEN and not connected_flag:
 		connected_flag = true
 		connected.emit()
 
-	if socket.get_ready_state() == WebSocketPeer.STATE_CLOSED and is_connected:
+	if socket.get_ready_state() == WebSocketPeer.STATE_CLOSED and connected_flag:
 		connected_flag = false
 		disconnected.emit()
 
@@ -37,7 +38,7 @@ func connect_to_server():
 		return
 	var err := socket.connect_to_url(server_url)
 	if err != OK:
-		push_error("Ne mogu da se povezem na server")
+		push_error("Ne mogu da se povežem na server")
 
 func send_data(data: Dictionary):
 	if socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
@@ -45,7 +46,7 @@ func send_data(data: Dictionary):
 
 func _handle_message(data: Dictionary):
 	match data.get("type", ""):
-		"room_created":
+		"room_created", "joined_room":
 			Session.room_code = data.get("roomCode", "")
 			Session.player_id = data.get("playerId", "")
 			room_created.emit(data)
@@ -56,13 +57,47 @@ func _handle_message(data: Dictionary):
 			lobby_updated.emit(data)
 		"game_start":
 			Session.players = data.get("players", [])
+			Session.current_round = data.get("roundNumber", 1)
+			Session.current_phase = data.get("phaseLabel", "")
+			Session.cue_giver_id = data.get("cueGiverId", "")
+			Session.current_hint = ""
+			Session.correct_tile = {}
+			Session.secret_tile = {}
+			Session.current_guesser_id = data.get("currentGuesserId", "")
+			Session.current_guesser_name = data.get("currentGuesserName", "")
+			Session.pending_tile_x = -1
+			Session.pending_tile_y = -1
 			game_started.emit(data)
 		"secret_tile":
-			Session.secret_tile = {"x": data.get("tileX", -1), "y": data.get("tileY", -1)}
+			Session.secret_tile = {
+				"x": data.get("tileX", -1),
+				"y": data.get("tileY", -1),
+				"code": data.get("tileCode", ""),
+				"color": data.get("color", {"r": 1.0, "g": 1.0, "b": 1.0})
+			}
 			secret_tile_received.emit(data)
-		"new_hint":
-			hint_received.emit(data)
-		"tile_selected":
-			tile_selected.emit(data)
+		"state_update":
+			Session.players = data.get("players", Session.players)
+			Session.current_round = data.get("roundNumber", Session.current_round)
+			Session.current_phase = data.get("phaseLabel", Session.current_phase)
+			Session.cue_giver_id = data.get("cueGiverId", Session.cue_giver_id)
+			Session.current_hint = data.get("hint", Session.current_hint)
+			Session.current_guesser_id = data.get("currentGuesserId", Session.current_guesser_id)
+			Session.current_guesser_name = data.get("currentGuesserName", Session.current_guesser_name)
+			state_updated.emit(data)
+		"round_result":
+			Session.players = data.get("players", Session.players)
+			Session.correct_tile = data.get("correctTile", {})
+			Session.round_scores = data.get("roundScores", [])
+			Session.next_cue_giver_id = data.get("nextCueGiverId", "")
+			Session.next_cue_giver_name = data.get("nextCueGiverName", "")
+			Session.current_guesser_id = ""
+			Session.current_guesser_name = ""
+			Session.pending_tile_x = -1
+			Session.pending_tile_y = -1
+			round_result_received.emit(data)
+		"game_over":
+			Session.players = data.get("players", Session.players)
+			game_over_received.emit(data)
 		"error":
-			error_received.emit(data.get("message", "Greska"))
+			error_received.emit(data.get("message", "Greška"))

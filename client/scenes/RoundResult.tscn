@@ -1,0 +1,66 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/RoundResult.gd" id="1"]
+
+[node name="RoundResult" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBox" type="VBoxContainer" parent="Center"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="Center/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Rezultat runde"
+
+[node name="PlayerNameLabel" type="Label" parent="Center/VBox"]
+layout_mode = 2
+text = "Ti si:"
+
+[node name="CorrectTileLabel" type="Label" parent="Center/VBox"]
+layout_mode = 2
+text = "Tačna kartica:"
+
+[node name="ColorCardPanel" type="PanelContainer" parent="Center/VBox"]
+layout_mode = 2
+
+[node name="ColorCardVBox" type="VBoxContainer" parent="Center/VBox/ColorCardPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ColorPreview" type="ColorRect" parent="Center/VBox/ColorCardPanel/ColorCardVBox"]
+custom_minimum_size = Vector2(180, 110)
+layout_mode = 2
+color = Color(1, 1, 1, 1)
+
+[node name="NextCueLabel" type="Label" parent="Center/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+text = "✨ Sledeći Cue Giver: ✨"
+
+[node name="ScoresContainer" type="VBoxContainer" parent="Center/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ContinueInfoLabel" type="Label" parent="Center/VBox"]
+layout_mode = 2
+text = "Čeka se sledeći Cue Giver."
+
+[node name="ReadyNextRoundButton" type="Button" parent="Center/VBox"]
+layout_mode = 2
+text = "Spreman sam za sledeću rundu"
+
+[connection signal="pressed" from="Center/VBox/ReadyNextRoundButton" to="." method="_on_ready_next_round_button_pressed"]
