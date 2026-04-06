@@ -1,0 +1,14 @@
+63f7b34db8d8cdea90c76aacccf841ec
+::res://::1775483652
+::res://scenes/::1775464623
+Game.tscn::PackedScene::-1::1775464623::0::1::::<><><>0<>0<><>::res://scripts/Game.gd
+Lobby.tscn::PackedScene::-1::1775464623::0::1::::<><><>0<>0<><>::res://scripts/Lobby.gd
+MainMenu.tscn::PackedScene::-1::1775464623::0::1::::<><><>0<>0<><>::res://scripts/MainMenu.gd
+RoundResult.tscn::PackedScene::-1::1775464623::0::1::::<><><>0<>0<><>::res://scripts/RoundResult.gd
+::res://scripts/::1775464813
+Game.gd::GDScript::1586152491452239278::1775464623::0::1::::<>Control<><>0<>0<><>::
+Lobby.gd::GDScript::5654948870213774765::1775464623::0::1::::<>Control<><>0<>0<><>::
+MainMenu.gd::GDScript::5508337832011294329::1775464623::0::1::::<>Control<><>0<>0<><>::
+NetworkManager.gd::GDScript::1712311705588498275::1775464623::0::1::::<>Node<><>0<>0<><>::
+RoundResult.gd::GDScript::5417881855249171793::1775464623::0::1::::<>Control<><>0<>0<><>::
+Session.gd::GDScript::6335162973899789853::1775464623::0::1::::<>Node<><>0<>0<><>::

@@ -1,0 +1,98 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/Game.gd" id="1"]
+
+[node name="Game" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="RootMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+
+[node name="HBox" type="HBoxContainer" parent="RootMargin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="LeftPanel" type="VBoxContainer" parent="RootMargin/HBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+custom_minimum_size = Vector2(280, 0)
+
+[node name="RoundLabel" type="Label" parent="RootMargin/HBox/LeftPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Runda: 1"
+
+[node name="PhaseLabel" type="Label" parent="RootMargin/HBox/LeftPanel"]
+layout_mode = 2
+text = "Faza:"
+
+[node name="CueGiverLabel" type="Label" parent="RootMargin/HBox/LeftPanel"]
+layout_mode = 2
+text = "Cue Giver:"
+
+[node name="HintLabel" type="Label" parent="RootMargin/HBox/LeftPanel"]
+layout_mode = 2
+text = "Hint:"
+
+[node name="SecretTileLabel" type="Label" parent="RootMargin/HBox/LeftPanel"]
+layout_mode = 2
+text = ""
+
+[node name="HintInput" type="LineEdit" parent="RootMargin/HBox/LeftPanel"]
+layout_mode = 2
+placeholder_text = "Unesi hint"
+
+[node name="SendHintButton" type="Button" parent="RootMargin/HBox/LeftPanel"]
+layout_mode = 2
+text = "Send Hint"
+
+[node name="InfoLabel" type="Label" parent="RootMargin/HBox/LeftPanel"]
+layout_mode = 2
+text = ""
+
+[node name="ScoreTitle" type="Label" parent="RootMargin/HBox/LeftPanel"]
+layout_mode = 2
+text = "Score"
+
+[node name="ScoreContainer" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="GridPanel" type="PanelContainer" parent="RootMargin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="GridMargin" type="MarginContainer" parent="RootMargin/HBox/GridPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="GridContainer" type="GridContainer" parent="RootMargin/HBox/GridPanel/GridMargin"]
+layout_mode = 2
+columns = 30
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 0
+
+[connection signal="pressed" from="RootMargin/HBox/LeftPanel/SendHintButton" to="." method="_on_send_hint_button_pressed"]
