@@ -67,6 +67,7 @@ func _handle_message(data: Dictionary):
 			Session.current_guesser_name = data.get("currentGuesserName", "")
 			Session.pending_tile_x = -1
 			Session.pending_tile_y = -1
+			Session.replay_votes = []
 			game_started.emit(data)
 		"secret_tile":
 			Session.secret_tile = {
@@ -98,6 +99,10 @@ func _handle_message(data: Dictionary):
 			round_result_received.emit(data)
 		"game_over":
 			Session.players = data.get("players", Session.players)
+			Session.replay_votes = data.get("replayVotes", [])
 			game_over_received.emit(data)
+		"replay_vote_update":
+			Session.replay_votes = data.get("replayVotes", [])
+			state_updated.emit(data)
 		"error":
 			error_received.emit(data.get("message", "Greška"))

@@ -21,6 +21,7 @@ var next_cue_giver_name := ""
 
 var pending_tile_x := -1
 var pending_tile_y := -1
+var replay_votes: Array = []
 
 func reset_game_state():
 	secret_tile = {}
@@ -36,3 +37,4 @@ func reset_game_state():
 	next_cue_giver_name = ""
 	pending_tile_x = -1
 	pending_tile_y = -1
+	replay_votes = []

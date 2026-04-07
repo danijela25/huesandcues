@@ -52,8 +52,8 @@ function hsvToRgb(h, s, v) {
 function tileColor(x, y) {
   const hue = x / 30.0;
   let saturation = 0.95;
-  let value = 1.0 - (y / 40.0);
-  if (value < 0.72) value = 0.72;
+  let value = 0.95 - (y / 48.0);
+  if (value < 0.68) value = 0.68;
   return hsvToRgb(hue, saturation, value);
 }
 
@@ -101,6 +101,7 @@ function startNewGame(room) {
   room.roundNumber = 1;
   room.maxRounds = room.players.length * 2;
   room.cueGiverIndex = 0;
+  room.replayVotes = [];
   startRound(room);
 }
 
@@ -109,6 +110,7 @@ function resetForReplay(room) {
     p.score = 0;
     p.ready = true;
   });
+  room.replayVotes = [];
   room.roundNumber = 1;
   room.cueGiverIndex = 0;
   startRound(room);
@@ -146,13 +148,15 @@ function startRound(room) {
   broadcastState(room);
 }
 
+function combinedGuesses(room) {
+  const map = {};
+  Object.values(room.guessesFirst || {}).forEach(g => { map[g.playerId] = g; });
+  Object.values(room.guessesSecond || {}).forEach(g => { map[g.playerId] = g; });
+  return Object.values(map);
+}
+
 function broadcastState(room) {
-  const guesses = [];
-  const source = room.phase === "second_guess" ? room.guessesSecond : room.guessesFirst;
-  Object.values(source).forEach((g) => guesses.push(g));
-
   const activeGuesser = currentGuesser(room);
-
   broadcast(room, {
     type: "state_update",
     roundNumber: room.roundNumber,
@@ -162,19 +166,19 @@ function broadcastState(room) {
     currentGuesserName: activeGuesser ? activeGuesser.name : "",
     hint: room.currentHint,
     players: room.players.map(playerView),
-    guesses,
+    guesses: combinedGuesses(room),
   });
 }
 
 function distance(a, b) {
-  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+  return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 }
 
 function pointsForGuess(guess, secret) {
   const d = distance(guess, secret);
   if (d === 0) return 3;
-  if (d <= 2) return 2;
-  if (d <= 4) return 1;
+  if (d === 1) return 2;
+  if (d === 2) return 1;
   return 0;
 }
 
@@ -183,6 +187,7 @@ function finishRound(room) {
   room.phase = "round_result";
   const roundScores = [];
   const cueGiver = room.players[room.cueGiverIndex];
+  let cueBonus = 0;
 
   room.players.forEach((player) => {
     if (player.id === cueGiver.id) return;
@@ -192,8 +197,11 @@ function finishRound(room) {
     const delta = guess ? pointsForGuess({ x: guess.x, y: guess.y }, room.secretTile) : 0;
     player.score += delta;
     roundScores.push({ name: player.name, delta });
-    if (delta >= 2) cueGiver.score += 1;
+    if (delta >= 2) cueBonus += 2;
   });
+
+  cueGiver.score += cueBonus;
+  roundScores.push({ name: cueGiver.name + " (Cue Giver)", delta: cueBonus });
 
   const nextIndex = (room.cueGiverIndex + 1) % room.players.length;
   room.nextCueGiverIndex = nextIndex;
@@ -218,6 +226,7 @@ function finishRound(room) {
     broadcast(room, {
       type: "game_over",
       players: room.players.map(playerView).sort((a, b) => b.score - a.score),
+      replayVotes: room.replayVotes || [],
     });
   }
 }
@@ -237,6 +246,7 @@ wss.on("connection", (ws) => {
         hostId: ws.playerId,
         status: "lobby",
         players: [{ id: ws.playerId, name: data.playerName || "Igrač", ready: false, score: 0, ws }],
+        replayVotes: [],
       };
       rooms[code] = room;
       ws.roomCode = code;
@@ -277,9 +287,12 @@ wss.on("connection", (ws) => {
       return;
     }
 
-    if (data.type === "restart_game") {
+    if (data.type === "restart_game_vote") {
       if (room.status !== "finished") return;
-      resetForReplay(room);
+      room.replayVotes = room.replayVotes || [];
+      if (!room.replayVotes.includes(ws.playerId)) room.replayVotes.push(ws.playerId);
+      broadcast(room, { type: "replay_vote_update", replayVotes: room.replayVotes });
+      if (room.replayVotes.length >= room.players.length) resetForReplay(room);
       return;
     }
 
@@ -346,6 +359,7 @@ wss.on("connection", (ws) => {
     const room = rooms[ws.roomCode];
     if (!room) return;
     room.players = room.players.filter((p) => p.id !== ws.playerId);
+    room.replayVotes = (room.replayVotes || []).filter((id) => id !== ws.playerId);
     if (room.players.length === 0) {
       delete rooms[ws.roomCode];
       return;
