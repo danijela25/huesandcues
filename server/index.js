@@ -50,10 +50,15 @@ function hsvToRgb(h, s, v) {
 }
 
 function tileColor(x, y) {
-  const hue = x / 30.0;
-  let saturation = 0.95;
-  let value = 0.95 - (y / 48.0);
-  if (value < 0.68) value = 0.68;
+  let hue = (x / 30.0) + (y / 200.0);
+  if (hue > 1.0) hue -= 1.0;
+
+  let saturation = 0.35 + y / 22.0;
+  if (saturation > 1.0) saturation = 1.0;
+
+  let value = 1.0 - y / 26.0;
+  if (value < 0.65) value = 0.65;
+
   return hsvToRgb(hue, saturation, value);
 }
 
