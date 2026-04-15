@@ -4,7 +4,7 @@ const crypto = require("crypto");
 const wss = new WebSocket.Server({ port: 3000 });
 const rooms = {};
 
-const MIN_PLAYERS = 2;
+const MIN_PLAYERS = 1;
 const MAX_PLAYERS = 6;
 const ROW_LETTERS = "ABCDEFGHIJKLMNOP";
 
@@ -197,9 +197,19 @@ function finishRound(room) {
   room.players.forEach((player) => {
     if (player.id === cueGiver.id) return;
     const first = room.guessesFirst[player.id];
+    const second = room.guessesSecond[player.id];
+    let delta = 0;
+    if (first) {
+      delta += pointsForGuess({ x: first.x, y: first.y }, room.secretTile);
+    }
+    if (second) {
+        delta += pointsForGuess({ x: second.x, y: second.y }, room.secretTile);
+      }
+  /*  const first = room.guessesFirst[player.id];
     const second = room.guessesSecond[player.id] || first;
     const guess = second || first;
     const delta = guess ? pointsForGuess({ x: guess.x, y: guess.y }, room.secretTile) : 0;
+    */
     player.score += delta;
     roundScores.push({ name: player.name, delta });
     if (delta >= 2) cueBonus += 2;
@@ -342,7 +352,24 @@ wss.on("connection", (ws) => {
       if (!activeGuesser || activeGuesser.id !== ws.playerId) return;
       const player = room.players.find((p) => p.id === ws.playerId);
       if (!player) return;
-      const guess = { playerId: player.id, name: player.name, x: Number(data.tileX), y: Number(data.tileY) };
+      const tileX = Number(data.tileX);
+      const tileY = Number(data.tileY);
+      const allGuesses = [
+  ...Object.values(room.guessesFirst || {}),
+  ...Object.values(room.guessesSecond || {})
+];
+
+if (allGuesses.some(g => g.x === tileX && g.y === tileY)) {
+  return send(ws, { type: "error", message: "Ovo polje je već zauzeto" });
+}
+      /*const guessPool= room.phase==="first_guess" ? room.guessesFirst : room.guessesSecond;
+      if(Object.values(guessPool).some(g => g.x === tileX && g.y === tileY)) {
+        return send(ws, { type: "error", message: "Ovo polje je već izabrano" });
+
+      }
+        */
+      const guess = { playerId: player.id, name: player.name, x: tileX, y: tileY };
+    //  const guess = { playerId: player.id, name: player.name, x: Number(data.tileX), y: Number(data.tileY) };
       if (room.phase === "first_guess") {
         room.guessesFirst[player.id] = guess;
         room.currentGuesserIndex += 1;
