@@ -1,12 +1,13 @@
 extends Control
 
-@onready var player_name_label: Label = $MainMargin/VBox/PlayerNameLabel
-@onready var room_code_label: Label = $MainMargin/VBox/RoomCodeLabel
-@onready var host_label: Label = $MainMargin/VBox/HostLabel
-@onready var players_container: VBoxContainer = $MainMargin/VBox/PlayersContainer
-@onready var ready_button: Button = $MainMargin/VBox/ButtonsHBox/ReadyButton
-@onready var start_button: Button = $MainMargin/VBox/ButtonsHBox/StartButton
-@onready var status_label: Label = $MainMargin/VBox/StatusLabel
+@onready var player_name_label: Label = $VBox/PlayerNameLabel
+@onready var room_code_label: Label = $VBox/RoomCodeLabel
+@onready var host_label: Label = $VBox/HostLabel
+@onready var players_container: VBoxContainer = $VBox/PlayersContainer
+@onready var ready_button: Button = $ButtonsHBox/ReadyButton
+@onready var start_button: Button = $ButtonsHBox/StartButton
+@onready var status_label: Label = $VBox/StatusLabel
+
 
 var is_ready := false
 
@@ -20,19 +21,23 @@ func _ready():
 	_refresh_ui()
 
 func _refresh_ui():
+
 	player_name_label.text = "Ti si: " + Session.player_name
 	room_code_label.text = "Kod sobe: " + Session.room_code
-	host_label.text = "Host ID: " + Session.host_id
+	#host_label.text = "Host ID: " + Session.host_id
 
 	for child in players_container.get_children():
 		child.queue_free()
 
 	for player in Session.players:
 		var label := Label.new()
+		label.add_theme_font_size_override("font_size", 37)
+		label.add_theme_constant_override("outline_size", 5)
+		label.add_theme_color_override("font_outline_size",Color.BLACK)
 		var ready_text := "Ready" if player.get("ready", false) else "Not Ready"
-		label.text = "%s - %s" % [player.get("name", "Igrač"), ready_text]
+		label.text = "     %s - %s" % [player.get("name", "Igrač"), ready_text]
 		players_container.add_child(label)
-
+	
 	start_button.visible = Session.player_id == Session.host_id
 	ready_button.text = "Not Ready" if is_ready else "Ready"
 

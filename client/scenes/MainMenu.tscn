@@ -1,8 +1,80 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://cc60xe4cineap"]
 
-[ext_resource type="Script" path="res://scripts/MainMenu.gd" id="1"]
+[ext_resource type="Script" uid="uid://d36v2665dutlb" path="res://scripts/MainMenu.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://y1pj2r17x7yj" path="res://scenes/dd5b468f-a164-45a1-b333-392825f7d3bb.jpg" id="2_0ykhv"]
+[ext_resource type="FontFile" uid="uid://bbowm65q6omht" path="res://scenes/Super Starfish.ttf" id="3_2wh52"]
+[ext_resource type="AudioStream" uid="uid://nvmqn0vne61t" path="res://assets/audio/music/Filo Starquez - The Shack (freetouse.com).mp3" id="4_ow34m"]
 
-[node name="MainMenu" type="Control"]
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_2wh52"]
+texture = ExtResource("2_0ykhv")
+modulate_color = Color(0.6120363, 0.61203635, 0.6120363, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0ykhv"]
+bg_color = Color(0.8963952, 0.91719097, 0.920739, 1)
+border_color = Color(0.8, 0.8, 0.8, 0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2wh52"]
+bg_color = Color(0.8980392, 0.91764706, 0.92156863, 1)
+border_color = Color(0.8, 0.8, 0.8, 0.047058824)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yqorp"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_826wr"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ucygd"]
+bg_color = Color(0.6422768, 0.65943116, 0.98140866, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ow34m"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l72w3"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+corner_radius_top_left = 1000
+corner_radius_top_right = 1000
+corner_radius_bottom_right = 1000
+corner_radius_bottom_left = 1300
+shadow_color = Color(0.67319953, 0.78172207, 1, 0.16862746)
+shadow_size = 1
+
+[node name="MainMenu" type="Control" unique_id=1526677697]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,45 +83,107 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="CenterBox" type="CenterContainer" parent="."]
+[node name="Panel" type="Panel" parent="." unique_id=1362621499]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -237.0
+offset_right = 246.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_2wh52")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterBox"]
-layout_mode = 2
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1652748699]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -592.0
+offset_top = -484.0
+offset_right = 592.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_stretch_ratio = 0.0
 theme_override_constants/separation = 12
 
-[node name="TitleLabel" type="Label" parent="CenterBox/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Hues and Cues"
-
-[node name="InfoLabel" type="Label" parent="CenterBox/VBoxContainer"]
-layout_mode = 2
-text = "Unesi ime i kreiraj sobu ili se pridruži postojećoj."
-
-[node name="NameInput" type="LineEdit" parent="CenterBox/VBoxContainer"]
-layout_mode = 2
+[node name="NameInput" type="LineEdit" parent="VBoxContainer" unique_id=1026828218]
 custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_placeholder_color = Color(0.13725491, 0.13725491, 0.13725491, 0.6)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_0ykhv")
 placeholder_text = "Unesi ime"
 
-[node name="RoomCodeInput" type="LineEdit" parent="CenterBox/VBoxContainer"]
+[node name="RoomCodeInput" type="LineEdit" parent="VBoxContainer" unique_id=2134951426]
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_placeholder_color = Color(0.13561678, 0.1356169, 0.13561681, 0.6)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_2wh52")
 placeholder_text = "Unesi kod sobe"
 
-[node name="CreateRoomButton" type="Button" parent="CenterBox/VBoxContainer"]
+[node name="CreateRoomButton" type="Button" parent="VBoxContainer" unique_id=807968738]
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.15247625, 0.15247661, 0.15247631, 1)
+theme_override_colors/font_pressed_color = Color(0.15487596, 0.154876, 0.1548759, 1)
+theme_override_colors/font_hover_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_font_sizes/font_size = 33
+theme_override_styles/normal = SubResource("StyleBoxFlat_yqorp")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_826wr")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ucygd")
 text = "Create Room"
 
-[node name="JoinRoomButton" type="Button" parent="CenterBox/VBoxContainer"]
+[node name="JoinRoomButton" type="Button" parent="VBoxContainer" unique_id=1363698751]
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_colors/font_pressed_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_colors/font_hover_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_font_sizes/font_size = 33
+theme_override_styles/normal = SubResource("StyleBoxFlat_ow34m")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_826wr")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ucygd")
 text = "Join Room"
 
-[node name="ErrorLabel" type="Label" parent="CenterBox/VBoxContainer"]
+[node name="ErrorLabel" type="Label" parent="VBoxContainer" unique_id=1012012240]
 layout_mode = 2
-text = ""
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 30
 
-[connection signal="pressed" from="CenterBox/VBoxContainer/CreateRoomButton" to="." method="_on_create_room_button_pressed"]
-[connection signal="pressed" from="CenterBox/VBoxContainer/JoinRoomButton" to="." method="_on_join_room_button_pressed"]
+[node name="TitleLabel" type="Label" parent="." unique_id=1334705558]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -465.0
+offset_top = 87.0
+offset_right = 465.0
+offset_bottom = 363.0
+grow_horizontal = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0.65882355, 0.7372549)
+theme_override_constants/shadow_offset_x = 15
+theme_override_constants/shadow_offset_y = 15
+theme_override_fonts/font = ExtResource("3_2wh52")
+theme_override_font_sizes/font_size = 120
+theme_override_styles/normal = SubResource("StyleBoxFlat_l72w3")
+text = "Hues and Cues"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=382098649]
+stream = ExtResource("4_ow34m")
+autoplay = true
+bus = &"Music"
+
+[connection signal="pressed" from="VBoxContainer/CreateRoomButton" to="." method="_on_create_room_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/JoinRoomButton" to="." method="_on_join_room_button_pressed"]

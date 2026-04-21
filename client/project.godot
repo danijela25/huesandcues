@@ -21,6 +21,8 @@ Session="*res://scripts/Session.gd"
 
 [display]
 
-window/size/viewport_width=1400
-window/size/viewport_height=900
+window/size/viewport_width=1600
+window/size/viewport_height=1000
+window/size/initial_position_type=0
 window/stretch/mode="viewport"
+window/stretch/aspect="expand"

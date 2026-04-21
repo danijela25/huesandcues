@@ -40,12 +40,20 @@ const ROW_LETTERS := "ABCDEFGHIJKLMNOP"
 @onready var logo_label: Label = $RootMargin/HBox/RightPanel/RightMargin/RightVBox/LogoLabel
 @onready var sidebar_players_container: VBoxContainer = $RootMargin/HBox/RightPanel/RightMargin/RightVBox/SidebarPlayersContainer
 @onready var sidebar_info_label: Label = $RootMargin/HBox/RightPanel/RightMargin/RightVBox/SidebarInfoLabel
-
+@onready var click_sound= $AudioStreamPlayer/AudioStreamPlayer
+@onready var celebration_sound=$AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer
+@onready var tatada_sound=$AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer
+@onready var loser_sound=$AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer
 var tile_buttons: Array = []
 var guess_markers: Array = []
+var player_index_map = {}
+var player_textures = {}
 
 func _ready():
 	set_anchors_preset(Control.PRESET_FULL_RECT)
+	get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
+	get_window().content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
+	_load_player_textures()
 	if not NetworkManager.secret_tile_received.is_connected(_on_secret_tile_received):
 		NetworkManager.secret_tile_received.connect(_on_secret_tile_received)
 	if not NetworkManager.state_updated.is_connected(_on_state_updated):
@@ -62,6 +70,13 @@ func _ready():
 	_create_grid()
 	_refresh_ui()
 
+func _load_player_textures():
+	player_textures[1] = preload("res://assets/players/PlayerBlue.png")
+	player_textures[2] = preload("res://assets/players/PlayerGreen.png")
+	player_textures[3] = preload("res://assets/players/PlayerOrange.png")
+	player_textures[4] = preload("res://assets/players/PlayerPink.png")
+	player_textures[5] = preload("res://assets/players/PlayerPurple.png")
+	player_textures[6] = preload("res://assets/players/PlayerRed.png")	
 func _make_stylebox(color: Color, border_color: Color = Color(0,0,0,0), border_width: int = 0, radius: int = 12) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = color
@@ -88,13 +103,20 @@ func _player_color(index: int) -> Color:
 	return colors[index % colors.size()]
 
 func _base_tile_color(x: int, y: int) -> Color:
-	var hue = float(x) / 30.0
-	var saturation = 0.85
-	var value = 1.0 - (float(y) / 46.0)
-	if value < 0.62:
-		value = 0.62
-	return Color.from_hsv(hue, saturation, value)
+	var hue := (float(x) / 30.0) + (float(y) / 200.0)
+	if hue > 1.0:
+		hue -= 1.0
 
+	var saturation := 0.35 + float(y) / 22.0
+	if saturation > 1.0:
+		saturation = 1.0
+
+	var value := 1.0 - float(y) / 26.0
+	if value < 0.65:
+		value = 0.65
+
+	return Color.from_hsv(hue, saturation, value)
+	
 func _apply_global_visual_style():
 	var bg := ColorRect.new()
 	bg.name = "Backdrop"
@@ -109,8 +131,6 @@ func _apply_global_visual_style():
 	round_result_panel.add_theme_stylebox_override("panel", _make_stylebox(Color(0.09, 0.09, 0.13, 0.98), Color("6a63c7"), 1, 16))
 	final_results_panel.add_theme_stylebox_override("panel", _make_stylebox(Color(0.09, 0.09, 0.13, 0.98), Color("6a63c7"), 1, 16))
 	right_panel.add_theme_stylebox_override("panel", _make_stylebox(Color(0.03, 0.03, 0.05, 0.99), Color("202036"), 1, 18))
-	left_panel.clip_contents = true
-	right_panel.clip_contents = true
 	$RootMargin/HBox/RightPanel/RightMargin/RightVBox/RoomCodePanel.add_theme_stylebox_override("panel", _make_stylebox(Color(0.09, 0.09, 0.13, 1.0), Color("343455"), 1, 10))
 	top_banner.add_theme_stylebox_override("panel", _make_stylebox(Color(0.10, 0.10, 0.14, 0.96), Color("3b355e"), 1, 12))
 
@@ -131,10 +151,10 @@ func _apply_global_visual_style():
 		lbl.add_theme_color_override("font_color", Color(0.95, 0.95, 1.0))
 	for lbl in [round_label, winner_label, next_cue_label, top_banner_label]:
 		lbl.add_theme_color_override("font_color", Color.WHITE)
-	logo_label.add_theme_font_size_override("font_size", 24)
+	logo_label.add_theme_font_size_override("font_size", 28)
 	logo_label.add_theme_color_override("font_color", Color.WHITE)
-	room_code_label.add_theme_font_size_override("font_size", 15)
-	top_banner_label.add_theme_font_size_override("font_size", 16)
+	room_code_label.add_theme_font_size_override("font_size", 18)
+	top_banner_label.add_theme_font_size_override("font_size", 18)
 
 func _style_button(btn: Button, base: Color, border: Color):
 	btn.add_theme_stylebox_override("normal", _make_stylebox(base, border, 1, 10))
@@ -148,26 +168,32 @@ func _create_board_labels():
 		child.queue_free()
 	for child in left_letters.get_children():
 		child.queue_free()
+
+	var tile_w := 33
+	var tile_h := 33
+
 	var spacer := Label.new()
-	spacer.custom_minimum_size = Vector2(26, 20)
+	spacer.custom_minimum_size = Vector2(32, tile_h)
 	top_numbers.add_child(spacer)
+
 	for x in range(30):
 		var lbl := Label.new()
-		lbl.custom_minimum_size = Vector2(24, 20)
+		lbl.custom_minimum_size = Vector2(tile_w, tile_h)
 		lbl.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		lbl.text = str(x + 1)
 		lbl.add_theme_color_override("font_color", Color.WHITE)
 		top_numbers.add_child(lbl)
+
 	for y in range(16):
 		var lbl := Label.new()
-		lbl.custom_minimum_size = Vector2(24, 24)
+		lbl.custom_minimum_size = Vector2(28, tile_h)
 		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		lbl.text = ROW_LETTERS[y]
 		lbl.add_theme_color_override("font_color", Color.WHITE)
 		left_letters.add_child(lbl)
-
 func _create_grid():
 	for child in grid.get_children():
 		child.free()
@@ -176,7 +202,7 @@ func _create_grid():
 	for y in range(16):
 		for x in range(30):
 			var btn := Button.new()
-			btn.custom_minimum_size = Vector2(24, 24)
+			btn.custom_minimum_size = Vector2(33, 33)
 			btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			btn.text = ""
@@ -184,7 +210,7 @@ func _create_grid():
 			btn.add_theme_font_size_override("font_size", 9)
 			btn.add_theme_color_override("font_color", Color.WHITE)
 			_apply_tile_style(btn, x, y)
-			btn.pivot_offset = Vector2(12, 12)
+			btn.pivot_offset = Vector2(16.5, 16.5)
 			btn.mouse_entered.connect(_on_tile_mouse_entered.bind(btn))
 			btn.mouse_exited.connect(_on_tile_mouse_exited.bind(btn))
 			btn.pressed.connect(_on_tile_pressed.bind(x, y))
@@ -216,15 +242,20 @@ func _marker_symbol(index: int) -> String:
 	return symbols[index] if index < symbols.size() else str(index + 1)
 
 func _store_guess_markers(guesses):
-	guess_markers.clear()
-	for i in range(guesses.size()):
-		var g = guesses[i]
+	if guesses.size() == 0:
+		return
+	guess_markers = []
+	for g in guesses:
+		var idx = player_index_map.get(g.playerId, 1)
 		guess_markers.append({
-			"x": int(g.get("x", 0)),
-			"y": int(g.get("y", 0)),
-			"symbol": _marker_symbol(i),
-			"color": _player_color(i)
-		})
+				"x": int(g.get("x", 0)),
+				"y": int(g.get("y", 0)),
+				"symbol": str(idx) + ("²" if g.get("type") == "second" else "¹"),
+				"color": _player_color(idx - 1),
+				"type": g.get("type")
+		
+		})	
+		print("GUESS DATA:", guesses)	
 
 func _aggregate_tile_symbols() -> Dictionary:
 	var tile_map := {}
@@ -235,31 +266,54 @@ func _aggregate_tile_symbols() -> Dictionary:
 		tile_map[key].append(marker)
 	return tile_map
 
+func _clear_avatar_markers():
+	for btn in tile_buttons:
+		for child in btn.get_children():
+			if child is Sprite2D:
+				child.queue_free()
+				
 func _draw_badge(parent: Control, symbol: String, color: Color, idx: int):
-	var badge := Label.new()
-	badge.text = symbol
-	badge.custom_minimum_size = Vector2(15, 15)
-	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	badge.position = Vector2(2 + (idx % 2) * 9, 2 + int(idx / 2) * 9)
-	badge.add_theme_font_size_override("font_size", 9)
-	badge.add_theme_color_override("font_color", Color.WHITE)
-	badge.add_theme_stylebox_override("normal", _make_stylebox(color, Color.WHITE, 1, 999))
-	parent.add_child(badge)
+	var player_num_text := symbol.substr(0, symbol.length() - 1)
+	var player_num := int(player_num_text)
 
+	var sprite := Sprite2D.new()
+	sprite.texture = player_textures.get(player_num, null)
+	if sprite.texture == null:
+		return
+
+	sprite.centered = true
+
+	var tex_size = sprite.texture.get_size()
+	var target_size := Vector2(38, 38)
+	var scale_x = target_size.x / tex_size.x
+	var scale_y = target_size.y / tex_size.y
+	sprite.scale = Vector2(scale_x, scale_y)
+
+	if idx == 0:
+		sprite.position = Vector2(12, 12)
+	elif idx == 1:
+		sprite.position = Vector2(28, 28)
+	elif idx == 2:
+		sprite.position = Vector2(28, 12)
+	else:
+		sprite.position = Vector2(12, 28)
+	parent.add_child(sprite)
 func _draw_guess_markers():
+	_clear_avatar_markers()
+
 	var tile_map = _aggregate_tile_symbols()
 	for key in tile_map.keys():
 		var parts = key.split("_")
 		var x = int(parts[0])
 		var y = int(parts[1])
 		var idx = y * 30 + x
+
 		if idx >= 0 and idx < tile_buttons.size():
 			var btn: Button = tile_buttons[idx]
 			var markers: Array = tile_map[key]
+
 			for i in range(markers.size()):
 				_draw_badge(btn, str(markers[i]["symbol"]), markers[i]["color"], i)
-
 func _clear_pending_marker():
 	for btn in tile_buttons:
 		for child in btn.get_children():
@@ -270,10 +324,12 @@ func _clear_grid_texts_only():
 	for btn in tile_buttons:
 		btn.text = ""
 		for child in btn.get_children():
-			child.queue_free()
+			if child is Label:
+				child.queue_free()
 	_draw_guess_markers()
 
 func _draw_correct_tile_matrix():
+	tatada_sound.play()
 	if Session.correct_tile.is_empty():
 		return
 	var cx := int(Session.correct_tile.get("x", -1))
@@ -341,7 +397,7 @@ func _on_tile_pressed(x: int, y: int):
 	if idx >= 0 and idx < tile_buttons.size():
 		var mark := Label.new()
 		mark.text = "?"
-		mark.position = Vector2(6, 3)
+		mark.position = Vector2(9, 6)
 		mark.add_theme_color_override("font_color", Color.WHITE)
 		tile_buttons[idx].add_child(mark)
 
@@ -362,29 +418,32 @@ func _on_send_hint_button_pressed():
 	NetworkManager.send_data({"type": "submit_hint", "hint": hint})
 	hint_input.text = ""
 
+	
 func _on_ready_next_round_button_pressed():
 	ready_next_round_button.disabled = true
 	round_result_panel.visible = false
 	guess_markers.clear()
+	_clear_avatar_markers()
 	NetworkManager.send_data({"type": "next_round_ready"})
-
 func _on_replay_button_pressed():
 	NetworkManager.send_data({"type": "restart_game_vote"})
 
 func _on_exit_button_pressed():
+	guess_markers.clear()
+	_clear_avatar_markers()
 	Session.reset_game_state()
 	get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
-
 func _on_secret_tile_received(_data):
 	_refresh_ui()
 
 func _on_state_updated(data):
-	_reset_all_tile_styles()
+	#_reset_all_tile_styles()
 	round_result_panel.visible = false
 	_refresh_ui()
 	if data.has("guesses"):
 		_store_guess_markers(data.get("guesses", []))
-	_clear_grid_texts_only()
+		_draw_guess_markers()
+	#_clear_grid_texts_only()
 
 func _show_round_result_inline():
 	round_result_panel.visible = true
@@ -407,16 +466,17 @@ func _update_replay_status():
 	replay_status_label.text = "Potvrde za novu partiju: %s/%s" % [str(Session.replay_votes.size()), str(Session.players.size())]
 
 func _on_round_result_received(_data):
-	_reset_all_tile_styles()
-	_clear_grid_texts_only()
+	#_reset_all_tile_styles()
+	#_clear_grid_texts_only()
 	_draw_correct_tile_matrix()
 	_flash_correct_area()
 	_pulse_scores()
 	_show_round_result_inline()
 
 func _on_game_over_received(data):
-	_reset_all_tile_styles()
-	_clear_grid_texts_only()
+	#_reset_all_tile_styles()
+	#_clear_grid_texts_only()
+	_clear_avatar_markers()
 	_draw_correct_tile_matrix()
 	round_result_panel.visible = false
 	final_results_panel.visible = true
@@ -449,12 +509,17 @@ func _on_game_over_received(data):
 		row.add_child(txt)
 		final_scores_container.add_child(row)
 	_update_replay_status()
+	_draw_guess_markers()
 
 func _on_error_received(message):
 	info_label.text = message
 
 func _refresh_ui():
 	player_name_label.text = "Ti si: " + Session.player_name
+	player_index_map.clear()
+	for i in range(Session.players.size()):
+		var p=Session.players[i]
+		player_index_map[p.id]=i+1
 	round_label.text = "Runda: " + str(Session.current_round)
 	phase_label.text = "Faza: " + Session.current_phase
 	hint_label.text = "Hint: " + Session.current_hint
@@ -506,19 +571,19 @@ func _refresh_ui():
 func _refresh_sidebar_players():
 	for child in sidebar_players_container.get_children():
 		child.queue_free()
+
 	room_code_label.text = "ROOM CODE: " + (Session.room_code if Session.room_code != "" else "-")
+
 	for i in range(Session.players.size()):
 		var player = Session.players[i]
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
 
-		var chip := Label.new()
-		chip.text = str(i + 1)
+		var chip := TextureRect.new()
 		chip.custom_minimum_size = Vector2(28, 28)
-		chip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		chip.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		chip.add_theme_color_override("font_color", Color.WHITE)
-		chip.add_theme_stylebox_override("normal", _make_stylebox(_player_color(i), Color.WHITE, 1, 999))
+		chip.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		chip.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		chip.texture = player_textures.get(i + 1, null)
 
 		var txt := Label.new()
 		var suffix = " (you)" if player.get("id", "") == Session.player_id else ""
@@ -527,47 +592,51 @@ func _refresh_sidebar_players():
 
 		var wrap := PanelContainer.new()
 		wrap.add_theme_stylebox_override("panel", _make_stylebox(Color(0.08, 0.08, 0.12, 1.0), Color("2e2e48"), 1, 10))
+
 		var inner := MarginContainer.new()
 		inner.add_theme_constant_override("margin_left", 8)
 		inner.add_theme_constant_override("margin_top", 6)
 		inner.add_theme_constant_override("margin_right", 8)
 		inner.add_theme_constant_override("margin_bottom", 6)
+
 		wrap.add_child(inner)
 		inner.add_child(row)
 
 		row.add_child(chip)
 		row.add_child(txt)
-		sidebar_players_container.add_child(wrap)
-
+		sidebar_players_container.add_child(wrap)	
 func _refresh_scores():
 	for child in score_container.get_children():
 		child.queue_free()
+
 	for i in range(Session.players.size()):
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
-		var chip := Label.new()
-		chip.text = str(i + 1)
+
+		var chip := TextureRect.new()
 		chip.custom_minimum_size = Vector2(22, 22)
-		chip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		chip.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		chip.add_theme_color_override("font_color", Color.WHITE)
-		chip.add_theme_stylebox_override("normal", _make_stylebox(_player_color(i), Color.WHITE, 1, 999))
+		chip.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		chip.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		chip.texture = player_textures.get(i + 1, null)
+
 		var txt := Label.new()
 		txt.text = "%s  %s" % [Session.players[i].get("name", "Igrač"), str(Session.players[i].get("score", 0))]
 		txt.add_theme_color_override("font_color", Color.WHITE)
+
 		var wrap := PanelContainer.new()
 		wrap.add_theme_stylebox_override("panel", _make_stylebox(Color(0.08, 0.08, 0.13, 1.0), Color("2c2850"), 1, 10))
+
 		var inner := MarginContainer.new()
 		inner.add_theme_constant_override("margin_left", 8)
 		inner.add_theme_constant_override("margin_top", 4)
 		inner.add_theme_constant_override("margin_right", 8)
 		inner.add_theme_constant_override("margin_bottom", 4)
+
 		wrap.add_child(inner)
 		inner.add_child(row)
 		row.add_child(chip)
 		row.add_child(txt)
 		score_container.add_child(wrap)
-
 func _get_player_name(player_id: String) -> String:
 	for player in Session.players:
 		if player.get("id", "") == player_id:

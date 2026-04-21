@@ -1,8 +1,45 @@
-[gd_scene format=3 uid="uid://1ha6xxq4dv54"]
+[gd_scene format=3 uid="uid://bnsyt5d7s6iny"]
 
-[ext_resource type="Script" uid="uid://duc8pywlu3foe" path="res://scripts/Game.gd" id="1"]
+[ext_resource type="Script" uid="uid://bj1kmtpubi2kf" path="res://scripts/Game.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://y1pj2r17x7yj" path="res://scenes/dd5b468f-a164-45a1-b333-392825f7d3bb.jpg" id="2_qbsmt"]
+[ext_resource type="AudioStream" uid="uid://cvk8cu6oqoomm" path="res://assets/audio/music/Walen - Gameboy (freetouse.com).mp3" id="3_cpr0p"]
+[ext_resource type="AudioStream" uid="uid://dhhlolx7iueu6" path="res://assets/audio/sfx/sound.wav" id="4_78awf"]
+[ext_resource type="AudioStream" uid="uid://cnmysr4j74akw" path="res://assets/audio/sfx/celebration-knuckles.mp3" id="5_aug50"]
+[ext_resource type="AudioStream" uid="uid://bdnxw2vbbv4cl" path="res://assets/audio/sfx/tadaaa.mp3" id="6_kiw3p"]
+[ext_resource type="AudioStream" uid="uid://thtql72h2dpc" path="res://assets/audio/sfx/thepriceisright-loserhorns_1.mp3" id="7_kiw3p"]
 
-[node name="Game" type="Control" unique_id=1354730590]
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_cpr0p"]
+texture = ExtResource("2_qbsmt")
+modulate_color = Color(1, 1, 1, 0.40784314)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qbsmt"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cpr0p"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_78awf"]
+bg_color = Color(0.6422768, 0.65943116, 0.98140866, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[node name="Game" type="Control" unique_id=1756394559]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,185 +48,200 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="RootMargin" type="MarginContainer" parent="." unique_id=1499227969]
+[node name="Panel" type="Panel" parent="." unique_id=1191471602]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 12.0
-offset_top = 12.0
-offset_right = -12.0
-offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_cpr0p")
+
+[node name="RootMargin" type="MarginContainer" parent="." unique_id=623282402]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="HBox" type="HBoxContainer" parent="RootMargin" unique_id=51086648]
+[node name="HBox" type="HBoxContainer" parent="RootMargin" unique_id=2086430467]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 14
 
-[node name="LeftPanel" type="PanelContainer" parent="RootMargin/HBox" unique_id=1076954719]
-custom_minimum_size = Vector2(235, 0)
+[node name="LeftPanel" type="PanelContainer" parent="RootMargin/HBox" unique_id=2038877388]
+custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 3
 
-[node name="LeftMargin" type="MarginContainer" parent="RootMargin/HBox/LeftPanel" unique_id=774551811]
+[node name="LeftMargin" type="MarginContainer" parent="RootMargin/HBox/LeftPanel" unique_id=1931947942]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="LeftVBox" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin" unique_id=103947505]
+[node name="LeftVBox" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin" unique_id=806816952]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="PlayerNameLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=2024725637]
+[node name="PlayerNameLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1334772411]
 layout_mode = 2
 text = "Ti si:"
 
-[node name="RoundLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=86948759]
+[node name="RoundLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1162993826]
 layout_mode = 2
 text = "Runda: 1"
 
-[node name="PhaseLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=960603391]
+[node name="PhaseLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1744979789]
 layout_mode = 2
 text = "Faza:"
 
-[node name="CueGiverLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1908590342]
+[node name="CueGiverLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1607405585]
 layout_mode = 2
 text = "Cue Giver:"
 
-[node name="CurrentPlayerLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1712964430]
+[node name="CurrentPlayerLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1288995159]
 layout_mode = 2
 text = "Na potezu:"
 
-[node name="HintLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=488250960]
+[node name="HintLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1806507849]
 layout_mode = 2
 text = "Hint:"
 
-[node name="CardTitleLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1237854283]
+[node name="CardTitleLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1660579269]
 layout_mode = 2
 text = "Kartica boje:"
 
-[node name="ColorCardPanel" type="PanelContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=769222703]
+[node name="ColorCardPanel" type="PanelContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1902083517]
 visible = false
 layout_mode = 2
 
-[node name="ColorCardVBox" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/ColorCardPanel" unique_id=192040849]
+[node name="ColorCardVBox" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/ColorCardPanel" unique_id=1066944511]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="SecretTileLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/ColorCardPanel/ColorCardVBox" unique_id=1398898635]
+[node name="SecretTileLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/ColorCardPanel/ColorCardVBox" unique_id=1627019138]
 layout_mode = 2
 
-[node name="ColorPreview" type="ColorRect" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/ColorCardPanel/ColorCardVBox" unique_id=1595724985]
+[node name="ColorPreview" type="ColorRect" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/ColorCardPanel/ColorCardVBox" unique_id=1228537541]
 custom_minimum_size = Vector2(150, 96)
 layout_mode = 2
 
-[node name="HintInput" type="LineEdit" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=2007101764]
+[node name="HintInput" type="LineEdit" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=431044632]
 layout_mode = 2
 placeholder_text = "Unesi hint"
 
-[node name="SendHintButton" type="Button" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1379681121]
+[node name="SendHintButton" type="Button" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1863627841]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_colors/font_pressed_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_colors/font_hover_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_qbsmt")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cpr0p")
+theme_override_styles/hover = SubResource("StyleBoxFlat_78awf")
 text = "Pošalji hint"
 
-[node name="SelectedTileLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1734683935]
+[node name="SelectedTileLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=51613436]
 layout_mode = 2
 
-[node name="ConfirmTileButton" type="Button" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=424508423]
+[node name="ConfirmTileButton" type="Button" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1720154005]
 visible = false
 layout_mode = 2
 text = "Potvrdi polje"
 
-[node name="InfoLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1600446557]
+[node name="InfoLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=2015331961]
 layout_mode = 2
 
-[node name="Divider" type="HSeparator" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1937199438]
+[node name="Divider" type="HSeparator" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1359873990]
 layout_mode = 2
 
-[node name="ScoreTitle" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1786223502]
+[node name="ScoreTitle" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1928712455]
 layout_mode = 2
 text = "Poeni"
 
-[node name="ScoreContainer" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1579848955]
+[node name="ScoreContainer" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=547987028]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="RoundResultPanel" type="PanelContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=874575483]
+[node name="RoundResultPanel" type="PanelContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1269576624]
 visible = false
 layout_mode = 2
 
-[node name="RoundResultVBox" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel" unique_id=411761372]
+[node name="RoundResultVBox" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel" unique_id=1964866823]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="RoundResultTitle" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel/RoundResultVBox" unique_id=1890800265]
+[node name="RoundResultTitle" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel/RoundResultVBox" unique_id=1285052427]
 layout_mode = 2
 text = "Rezultat runde"
 
-[node name="RoundCorrectTileLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel/RoundResultVBox" unique_id=708367602]
+[node name="RoundCorrectTileLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel/RoundResultVBox" unique_id=1406485898]
 layout_mode = 2
 text = "Tačna kartica:"
 
-[node name="RoundColorPreview" type="ColorRect" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel/RoundResultVBox" unique_id=882587919]
+[node name="RoundColorPreview" type="ColorRect" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel/RoundResultVBox" unique_id=163294900]
 custom_minimum_size = Vector2(170, 96)
 layout_mode = 2
 
-[node name="NextCueLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel/RoundResultVBox" unique_id=333503953]
+[node name="NextCueLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel/RoundResultVBox" unique_id=675841375]
 layout_mode = 2
 text = "Sledeći Cue Giver:"
 
-[node name="RoundScoresContainer" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel/RoundResultVBox" unique_id=602512812]
+[node name="RoundScoresContainer" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel/RoundResultVBox" unique_id=1777296874]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="ReadyNextRoundButton" type="Button" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel/RoundResultVBox" unique_id=1191529861]
+[node name="ReadyNextRoundButton" type="Button" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel/RoundResultVBox" unique_id=2024673505]
 visible = false
 layout_mode = 2
 text = "Spreman sam za sledeću rundu"
 
-[node name="FinalResultsPanel" type="PanelContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=171102436]
+[node name="FinalResultsPanel" type="PanelContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox" unique_id=1992768164]
 visible = false
 layout_mode = 2
 
-[node name="FinalResultsVBox" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel" unique_id=2131563295]
+[node name="FinalResultsVBox" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel" unique_id=1798532076]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="FinalTitleLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox" unique_id=674236844]
+[node name="FinalTitleLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox" unique_id=690817607]
 layout_mode = 2
 text = "Kraj igre"
 
-[node name="WinnerLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox" unique_id=783053700]
+[node name="WinnerLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox" unique_id=1452974333]
 layout_mode = 2
 text = "Pobednik:"
 
-[node name="FinalScoresContainer" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox" unique_id=2072607985]
+[node name="FinalScoresContainer" type="VBoxContainer" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox" unique_id=1658955604]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="ReplayStatusLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox" unique_id=2134724120]
+[node name="ReplayStatusLabel" type="Label" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox" unique_id=1131863390]
 layout_mode = 2
 text = "Potvrde za novu partiju: 0/0"
 
-[node name="ReplayButton" type="Button" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox" unique_id=1678080733]
+[node name="ReplayButton" type="Button" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox" unique_id=1169294645]
 layout_mode = 2
 text = "Igraj ponovo"
 
-[node name="ExitButton" type="Button" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox" unique_id=1808157653]
+[node name="ExitButton" type="Button" parent="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox" unique_id=470552067]
 layout_mode = 2
 text = "Izađi u meni"
 
-[node name="GridPanel" type="PanelContainer" parent="RootMargin/HBox" unique_id=852732871]
+[node name="GridPanel" type="PanelContainer" parent="RootMargin/HBox" unique_id=37745395]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="GridMargin" type="MarginContainer" parent="RootMargin/HBox/GridPanel" unique_id=890060283]
+[node name="GridMargin" type="MarginContainer" parent="RootMargin/HBox/GridPanel" unique_id=1778570752]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -198,35 +250,35 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="GridLayout" type="VBoxContainer" parent="RootMargin/HBox/GridPanel/GridMargin" unique_id=1452067246]
+[node name="GridLayout" type="VBoxContainer" parent="RootMargin/HBox/GridPanel/GridMargin" unique_id=401744708]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="TopBanner" type="PanelContainer" parent="RootMargin/HBox/GridPanel/GridMargin/GridLayout" unique_id=189591302]
+[node name="TopBanner" type="PanelContainer" parent="RootMargin/HBox/GridPanel/GridMargin/GridLayout" unique_id=1354097067]
 layout_mode = 2
 
-[node name="TopBannerLabel" type="Label" parent="RootMargin/HBox/GridPanel/GridMargin/GridLayout/TopBanner" unique_id=119151680]
+[node name="TopBannerLabel" type="Label" parent="RootMargin/HBox/GridPanel/GridMargin/GridLayout/TopBanner" unique_id=1273853723]
 layout_mode = 2
 text = "CUE GIVER"
 
-[node name="TopNumbers" type="HBoxContainer" parent="RootMargin/HBox/GridPanel/GridMargin/GridLayout" unique_id=342843483]
+[node name="TopNumbers" type="HBoxContainer" parent="RootMargin/HBox/GridPanel/GridMargin/GridLayout" unique_id=231481229]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 2
 
-[node name="GridRowsArea" type="HBoxContainer" parent="RootMargin/HBox/GridPanel/GridMargin/GridLayout" unique_id=603817136]
+[node name="GridRowsArea" type="HBoxContainer" parent="RootMargin/HBox/GridPanel/GridMargin/GridLayout" unique_id=2016656177]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 4
 
-[node name="LeftLetters" type="VBoxContainer" parent="RootMargin/HBox/GridPanel/GridMargin/GridLayout/GridRowsArea" unique_id=655643069]
+[node name="LeftLetters" type="VBoxContainer" parent="RootMargin/HBox/GridPanel/GridMargin/GridLayout/GridRowsArea" unique_id=384077172]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="GridContainer" type="GridContainer" parent="RootMargin/HBox/GridPanel/GridMargin/GridLayout/GridRowsArea" unique_id=1490885678]
+[node name="GridContainer" type="GridContainer" parent="RootMargin/HBox/GridPanel/GridMargin/GridLayout/GridRowsArea" unique_id=1190509377]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -234,48 +286,74 @@ theme_override_constants/h_separation = 2
 theme_override_constants/v_separation = 2
 columns = 30
 
-[node name="RightPanel" type="PanelContainer" parent="RootMargin/HBox" unique_id=1878420188]
-custom_minimum_size = Vector2(190, 0)
+[node name="RightPanel" type="PanelContainer" parent="RootMargin/HBox" unique_id=286571891]
+custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 3
 
-[node name="RightMargin" type="MarginContainer" parent="RootMargin/HBox/RightPanel" unique_id=412020394]
+[node name="RightMargin" type="MarginContainer" parent="RootMargin/HBox/RightPanel" unique_id=1195530646]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="RightVBox" type="VBoxContainer" parent="RootMargin/HBox/RightPanel/RightMargin" unique_id=1240917938]
+[node name="RightVBox" type="VBoxContainer" parent="RootMargin/HBox/RightPanel/RightMargin" unique_id=1718191037]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="LogoLabel" type="Label" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox" unique_id=1343569838]
+[node name="LogoLabel" type="Label" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox" unique_id=1853603552]
 layout_mode = 2
 text = "HUES
 AND
 CUES"
 
-[node name="RoomCodePanel" type="PanelContainer" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox" unique_id=69245281]
+[node name="RoomCodePanel" type="PanelContainer" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox" unique_id=1485797915]
 layout_mode = 2
 
-[node name="RoomCodeLabel" type="Label" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox/RoomCodePanel" unique_id=1312006255]
+[node name="RoomCodeLabel" type="Label" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox/RoomCodePanel" unique_id=981917375]
 layout_mode = 2
 text = "ROOM CODE: -"
 
-[node name="SidebarPlayersTitle" type="Label" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox" unique_id=1814901945]
+[node name="SidebarPlayersTitle" type="Label" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox" unique_id=372242556]
 layout_mode = 2
 text = "Igrači"
 
-[node name="SidebarPlayersContainer" type="VBoxContainer" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox" unique_id=1162153923]
+[node name="SidebarPlayersContainer" type="VBoxContainer" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox" unique_id=1124309806]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="SidebarInfoLabel" type="Label" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox" unique_id=415505388]
-visible = false
+[node name="SidebarInfoLabel" type="Label" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox" unique_id=1361188091]
 layout_mode = 2
-text = "Igra sa istim igračima"
+text = "
+"
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=503414440]
+stream = ExtResource("3_cpr0p")
+volume_db = -20.0
+autoplay = true
+bus = &"Music"
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="AudioStreamPlayer" unique_id=1736482956]
+stream = ExtResource("4_78awf")
+bus = &"SFX"
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="AudioStreamPlayer/AudioStreamPlayer" unique_id=1624889597]
+stream = ExtResource("5_aug50")
+bus = &"SFX"
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer" unique_id=288358669]
+stream = ExtResource("6_kiw3p")
+bus = &"SFX"
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer" unique_id=1086730545]
+stream = ExtResource("7_kiw3p")
+bus = &"SFX"
+
+[node name="PlayerBlue" type="CharacterBody2D" parent="." unique_id=303578869]
+
+[node name="Sprite2D" type="Sprite2D" parent="PlayerBlue" unique_id=393466095]
 
 [connection signal="pressed" from="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/SendHintButton" to="." method="_on_send_hint_button_pressed"]
 [connection signal="pressed" from="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/ConfirmTileButton" to="." method="_on_confirm_tile_button_pressed"]

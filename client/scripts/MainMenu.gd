@@ -1,8 +1,8 @@
 extends Control
 
-@onready var name_input: LineEdit = $CenterBox/VBoxContainer/NameInput
-@onready var room_code_input: LineEdit = $CenterBox/VBoxContainer/RoomCodeInput
-@onready var error_label: Label = $CenterBox/VBoxContainer/ErrorLabel
+@onready var name_input: LineEdit = $VBoxContainer/NameInput
+@onready var room_code_input: LineEdit = $VBoxContainer/RoomCodeInput
+@onready var error_label: Label = $VBoxContainer/ErrorLabel
 
 var scene_changing := false
 
