@@ -44,16 +44,40 @@ const ROW_LETTERS := "ABCDEFGHIJKLMNOP"
 @onready var celebration_sound=$AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer
 @onready var tatada_sound=$AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer
 @onready var loser_sound=$AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer
+@onready var leave_room_button= $RootMargin/HBox/RightPanel/RightMargin/RightVBox/LeaveRoom
+@onready var continue_game_button=$RootMargin/HBox/RightPanel/RightMargin/RightVBox/ContinueButton
+@onready var music_button=$RootMargin/HBox/RightPanel/RightMargin/RightVBox/MusicButton
 var tile_buttons: Array = []
 var guess_markers: Array = []
 var player_index_map = {}
 var player_textures = {}
+func _on_player_left_received(data):
+	Session.players = data.get("players", [])
 
+	var votes = data.get("continueVotes", [])
+	info_label.text = data.get("message", "Igrač je napustio sobu.") + " Potvrde: " + str(votes.size()) + "/" + str(Session.players.size())
+
+	continue_game_button.visible = bool(data.get("canContinue", false))
+	leave_room_button.visible = true
+
+	_refresh_ui()
 func _ready():
+	music_button.pressed.connect(_on_music_button_pressed)
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
 	get_window().content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
 	_load_player_textures()
+	continue_game_button.visible = false
+	leave_room_button.visible = true
+
+	if not leave_room_button.pressed.is_connected(_on_leave_room_button_pressed):
+
+		leave_room_button.pressed.connect(_on_leave_room_button_pressed)
+
+	if not continue_game_button.pressed.is_connected(_on_continue_game_button_pressed):
+		continue_game_button.pressed.connect(_on_continue_game_button_pressed)
+	if not NetworkManager.player_left_received.is_connected(_on_player_left_received):
+		NetworkManager.player_left_received.connect(_on_player_left_received)
 	if not NetworkManager.secret_tile_received.is_connected(_on_secret_tile_received):
 		NetworkManager.secret_tile_received.connect(_on_secret_tile_received)
 	if not NetworkManager.state_updated.is_connected(_on_state_updated):
@@ -273,19 +297,19 @@ func _draw_badge(parent: Control, symbol: String, color: Color, idx: int):
 	sprite.centered = true
 
 	var tex_size = sprite.texture.get_size()
-	var target_size := Vector2(38, 38)
+	var target_size := Vector2(50, 50)
 	var scale_x = target_size.x / tex_size.x
 	var scale_y = target_size.y / tex_size.y
 	sprite.scale = Vector2(scale_x, scale_y)
 
 	if idx == 0:
-		sprite.position = Vector2(12, 12)
+		sprite.position = Vector2(16.5, 16.5)
 	elif idx == 1:
-		sprite.position = Vector2(28, 28)
+		sprite.position = Vector2(16.5, 16.5)
 	elif idx == 2:
-		sprite.position = Vector2(28, 12)
+		sprite.position = Vector2(16.5, 16.5)
 	else:
-		sprite.position = Vector2(12, 28)
+		sprite.position = Vector2(16.5, 16.5)
 	parent.add_child(sprite)
 func _draw_guess_markers():
 	_clear_avatar_markers()
@@ -389,7 +413,14 @@ func _on_tile_pressed(x: int, y: int):
 		mark.position = Vector2(9, 6)
 		mark.add_theme_color_override("font_color", Color.WHITE)
 		tile_buttons[idx].add_child(mark)
-
+func _on_continue_game_button_pressed():
+	continue_game_button.disabled = true
+	info_label.text = "Čeka se potvrda ostalih igrača..."
+	NetworkManager.send_data({"type": "continue_after_leave"})
+func _on_leave_room_button_pressed():
+	NetworkManager.send_data({"type": "leave_room"})
+	Session.reset_game_state()
+	get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
 func _on_confirm_tile_button_pressed():
 	if Session.pending_tile_x < 0 or Session.pending_tile_y < 0:
 		return
@@ -634,3 +665,14 @@ func _get_player_name(player_id: String) -> String:
 		if player.get("id", "") == player_id:
 			return player.get("name", "Igrač")
 	return "?"
+var music_muted := false
+
+func _on_music_button_pressed():
+	music_muted = !music_muted
+
+	AudioServer.set_bus_mute(0, music_muted)
+
+	if music_muted:
+		music_button.text = "🔇 Muzika"
+	else:
+		music_button.text = "🔊 Mute"

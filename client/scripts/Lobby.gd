@@ -31,7 +31,7 @@ func _refresh_ui():
 
 	for player in Session.players:
 		var label := Label.new()
-		label.add_theme_font_size_override("font_size", 37)
+		label.add_theme_font_size_override("font_size", 25)
 		label.add_theme_constant_override("outline_size", 5)
 		label.add_theme_color_override("font_outline_size",Color.BLACK)
 		var ready_text := "Ready" if player.get("ready", false) else "Not Ready"

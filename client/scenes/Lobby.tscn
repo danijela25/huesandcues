@@ -79,9 +79,9 @@ grow_vertical = 2
 [node name="VBox" type="VBoxContainer" parent="." unique_id=1251755588]
 layout_mode = 0
 offset_left = 40.0
-offset_top = 40.0
+offset_top = 37.0
 offset_right = 1560.0
-offset_bottom = 595.0
+offset_bottom = 540.0
 theme_override_constants/separation = 10
 
 [node name="TitleLabel" type="Label" parent="VBox" unique_id=1749482498]
@@ -126,7 +126,7 @@ layout_mode = 2
 size_flags_vertical = 6
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
-theme_override_font_sizes/font_size = 45
+theme_override_font_sizes/font_size = 35
 text = "Igrači:"
 
 [node name="PlayersContainer" type="VBoxContainer" parent="VBox" unique_id=379853929]
@@ -142,7 +142,7 @@ layout_mode = 2
 size_flags_vertical = 6
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
-theme_override_font_sizes/font_size = 45
+theme_override_font_sizes/font_size = 35
 text = "Čekanje igrača..."
 
 [node name="ButtonsHBox" type="HBoxContainer" parent="." unique_id=1430869980]
