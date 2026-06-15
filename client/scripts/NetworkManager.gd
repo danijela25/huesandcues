@@ -1,5 +1,5 @@
 extends Node
-
+signal player_left_received(data)
 signal connected
 signal disconnected
 signal room_created(data)
@@ -106,3 +106,5 @@ func _handle_message(data: Dictionary):
 			state_updated.emit(data)
 		"error":
 			error_received.emit(data.get("message", "Greška"))
+		"player_left":
+			player_left_received.emit(data)

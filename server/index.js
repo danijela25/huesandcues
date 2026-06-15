@@ -1,12 +1,14 @@
   const WebSocket = require("ws");
   const crypto = require("crypto");
 
-  const wss = new WebSocket.Server({ port: 3000 });
+const PORT = process.env.PORT || 3000;
+const wss = new WebSocket.Server({ port: PORT });
   const rooms = {};
 
-  const MIN_PLAYERS = 2;
+  const MIN_PLAYERS = 3;
   const MAX_PLAYERS = 6;
   const ROW_LETTERS = "ABCDEFGHIJKLMNOP";
+  console.log("Server radi na portu " + PORT);
  console.log("SERVER STARTED NOVA VERZIJA");
   function send(ws, data) {
     if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(data));
@@ -244,7 +246,35 @@
       });
     }
   }
+function removePlayerFromRoom(ws, disconnected = false) {
+  const room = rooms[ws.roomCode];
+  if (!room) return;
 
+  const leavingName = (room.players.find(p => p.id === ws.playerId) || {}).name || "Igrač";
+  room.players = room.players.filter(p => p.id !== ws.playerId);
+  room.replayVotes = (room.replayVotes || []).filter(id => id !== ws.playerId);
+
+  if (room.players.length === 0) {
+    delete rooms[ws.roomCode];
+    return;
+  }
+
+  if (room.hostId === ws.playerId) {
+    room.hostId = room.players[0].id;
+  }
+room.status = "paused_after_leave";
+room.continueVotes = [];
+  broadcast(room, {
+     continueVotes: room.continueVotes, 
+    type: "player_left",
+    message: leavingName + " je napustio sobu.",
+    players: room.players.map(playerView),
+    hostId: room.hostId,
+    canContinue: room.players.length >= 2
+  });
+
+  broadcastState(room);
+}
   wss.on("connection", (ws) => {
     ws.playerId = crypto.randomUUID();
     ws.roomCode = null;
@@ -283,6 +313,10 @@
 
       const room = rooms[ws.roomCode];
       if (!room) return;
+      if (data.type === "leave_room") {
+         removePlayerFromRoom(ws, false);
+          return;
+        }
 
       if (data.type === "player_ready") {
         const player = room.players.find((p) => p.id === ws.playerId);
@@ -321,6 +355,34 @@
         return;
       }
 
+   if (data.type === "continue_after_leave") {
+  if (room.status !== "paused_after_leave") return;
+
+  room.continueVotes = room.continueVotes || [];
+
+  if (!room.continueVotes.includes(ws.playerId)) {
+    room.continueVotes.push(ws.playerId);
+  }
+
+  broadcast(room, {
+    type: "player_left",
+    message: "Čekanje da svi potvrde nastavak.",
+    players: room.players.map(playerView),
+    hostId: room.hostId,
+    canContinue: true,
+    continueVotes: room.continueVotes
+  });
+
+  if (room.continueVotes.length < room.players.length) {
+    return;
+  }
+
+  room.status = "playing";
+  room.continueVotes = [];
+
+  startRound(room);
+  return;
+}
       if (room.status !== "playing") return;
       const cueGiver = room.players[room.cueGiverIndex];
 
@@ -398,23 +460,7 @@ console.log("GUESSES_SECOND", room.guessesSecond);
     });
 
     ws.on("close", () => {
-      const room = rooms[ws.roomCode];
-      if (!room) return;
-      room.players = room.players.filter((p) => p.id !== ws.playerId);
-      room.replayVotes = (room.replayVotes || []).filter((id) => id !== ws.playerId);
-      if (room.players.length === 0) {
-        delete rooms[ws.roomCode];
-        return;
-      }
-      if (room.hostId === ws.playerId) room.hostId = room.players[0].id;
-      broadcast(room, {
-  type: "player_left",
-  message: "Jedan igrač je napustio sobu.",
-  players: room.players.map(playerView),
-  hostId: room.hostId
-});
-
-      broadcast(room, getLobbyState(room));
+      removePlayerFromRoom(ws, true);
     });
   });
 

@@ -39,6 +39,24 @@ corner_radius_bottom_left = 28
 shadow_size = 5
 shadow_offset = Vector2(0, 3)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kiw3p"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_400sg"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
 [node name="Game" type="Control" unique_id=1756394559]
 layout_mode = 3
 anchors_preset = 15
@@ -329,6 +347,27 @@ layout_mode = 2
 text = "
 "
 
+[node name="LeaveRoom" type="Button" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox" unique_id=1011118097]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_colors/font_pressed_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_colors/font_hover_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_kiw3p")
+text = "Izađi iz igre
+"
+
+[node name="ContinueButton" type="Button" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox" unique_id=2020520194]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_colors/font_pressed_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_colors/font_hover_color = Color(0.15294118, 0.15294118, 0.15294118, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_400sg")
+text = "Nastavi igru"
+
+[node name="MusicButton" type="CheckButton" parent="RootMargin/HBox/RightPanel/RightMargin/RightVBox" unique_id=2081998506]
+layout_mode = 2
+text = "🔊 Mute"
+
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=503414440]
 stream = ExtResource("3_cpr0p")
 volume_db = -20.0
@@ -360,3 +399,5 @@ bus = &"SFX"
 [connection signal="pressed" from="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/RoundResultPanel/RoundResultVBox/ReadyNextRoundButton" to="." method="_on_ready_next_round_button_pressed"]
 [connection signal="pressed" from="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox/ReplayButton" to="." method="_on_replay_button_pressed"]
 [connection signal="pressed" from="RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox/ExitButton" to="." method="_on_exit_button_pressed"]
+[connection signal="pressed" from="RootMargin/HBox/RightPanel/RightMargin/RightVBox/LeaveRoom" to="." method="_on_leave_room_button_pressed"]
+[connection signal="pressed" from="RootMargin/HBox/RightPanel/RightMargin/RightVBox/ContinueButton" to="." method="_on_continue_game_button_pressed"]
