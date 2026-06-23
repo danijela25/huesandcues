@@ -24,6 +24,11 @@ var pending_tile_y := -1
 var replay_votes: Array = []
 
 func reset_game_state():
+	players = []
+	player_id = ""
+	room_code = ""
+	host_id = ""
+	player_name = ""
 	secret_tile = {}
 	current_round = 1
 	current_phase = ""

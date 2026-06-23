@@ -19,12 +19,19 @@ func _ready():
 
 func _on_create_room_button_pressed():
 	var entered_name := name_input.text.strip_edges()
+
 	if entered_name == "":
 		error_label.text = "Unesi ime"
 		return
 
 	Session.player_name = entered_name
+
+	if NetworkManager.socket.get_ready_state() != WebSocketPeer.STATE_OPEN:
+		error_label.text = "Povezivanje sa serverom..."
+		return
+
 	error_label.text = ""
+
 	NetworkManager.send_data({
 		"type": "create_room",
 		"playerName": entered_name
@@ -39,7 +46,13 @@ func _on_join_room_button_pressed():
 		return
 
 	Session.player_name = entered_name
+
+	if NetworkManager.socket.get_ready_state() != WebSocketPeer.STATE_OPEN:
+		error_label.text = "Povezivanje sa serverom... sačekaj 2 sekunde pa klikni opet"
+		return
+
 	error_label.text = ""
+
 	NetworkManager.send_data({
 		"type": "join_room",
 		"playerName": entered_name,

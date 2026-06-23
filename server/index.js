@@ -53,10 +53,13 @@ const wss = new WebSocket.Server({ port: PORT });
 
   function tileColor(x, y) {
     const hue = x / 30.0;
-    let saturation = 0.95;
-    let value = 0.95 - (y / 48.0);
-    if (value < 0.68) value = 0.68;
-    return hsvToRgb(hue, saturation, value);
+  let saturation = 0.45 + y * 0.035;
+  let value = 1.0 - y * 0.025;
+
+  if (saturation > 0.98) saturation = 0.98;
+  if (value < 0.60) value = 0.60;
+
+  return hsvToRgb(hue, saturation, value);
   }
 
   function phaseLabel(phase) {
@@ -141,10 +144,9 @@ const wss = new WebSocket.Server({ port: PORT });
 
     send(cueGiver.ws, {
       type: "secret_tile",
-      tileX: room.secretTile.x,
-      tileY: room.secretTile.y,
-      tileCode: tileCode(room.secretTile.x, room.secretTile.y),
-      color: tileColor(room.secretTile.x, room.secretTile.y),
+  tileX: room.secretTile.x,
+  tileY: room.secretTile.y,
+  tileCode: tileCode(room.secretTile.x, room.secretTile.y)
     });
 
     broadcastState(room);
@@ -228,7 +230,7 @@ const wss = new WebSocket.Server({ port: PORT });
     x: room.secretTile.x,
     y: room.secretTile.y,
     code: tileCode(room.secretTile.x, room.secretTile.y),
-    color: tileColor(room.secretTile.x, room.secretTile.y),
+    
   },
   players: room.players.map(playerView),
   roundScores,
@@ -265,15 +267,13 @@ function removePlayerFromRoom(ws, disconnected = false) {
 room.status = "paused_after_leave";
 room.continueVotes = [];
   broadcast(room, {
-     continueVotes: room.continueVotes, 
-    type: "player_left",
-    message: leavingName + " je napustio sobu.",
-    players: room.players.map(playerView),
-    hostId: room.hostId,
-    canContinue: room.players.length >= 2
-  });
+  type: "player_left",
+  message: leavingName + " je napustio sobu.",
+  players: room.players.map(playerView),
+  hostId: room.hostId
+});
 
-  broadcastState(room);
+return;
 }
   wss.on("connection", (ws) => {
     ws.playerId = crypto.randomUUID();
@@ -336,11 +336,7 @@ room.continueVotes = [];
       }
 
       if (data.type === "restart_game_vote") {
-        if (room.status !== "finished") return;
-        room.replayVotes = room.replayVotes || [];
-        if (!room.replayVotes.includes(ws.playerId)) room.replayVotes.push(ws.playerId);
-        broadcast(room, { type: "replay_vote_update", replayVotes: room.replayVotes });
-        if (room.replayVotes.length >= room.players.length) resetForReplay(room);
+        
         return;
       }
 

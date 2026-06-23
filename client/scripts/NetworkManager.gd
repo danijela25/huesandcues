@@ -12,7 +12,7 @@ signal game_over_received(data)
 signal error_received(message)
 
 var socket := WebSocketPeer.new()
-var server_url := "ws://127.0.0.1:3000"
+var server_url := "wss://huesandcues.onrender.com"
 var connected_flag := false
 
 func _process(_delta):
@@ -34,15 +34,27 @@ func _process(_delta):
 			_handle_message(data)
 
 func connect_to_server():
-	if socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
+	var state := socket.get_ready_state()
+
+	if state == WebSocketPeer.STATE_OPEN or state == WebSocketPeer.STATE_CONNECTING:
 		return
+
+	if state == WebSocketPeer.STATE_CLOSING:
+		return
+
+	socket = WebSocketPeer.new()
 	var err := socket.connect_to_url(server_url)
+
 	if err != OK:
 		push_error("Ne mogu da se povežem na server")
 
 func send_data(data: Dictionary):
+	print("SALJEM:", data, " STATE:", socket.get_ready_state())
+
 	if socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
 		socket.send_text(JSON.stringify(data))
+	else:
+		print("NIJE POVEZAN NA SERVER")
 
 func _handle_message(data: Dictionary):
 	match data.get("type", ""):

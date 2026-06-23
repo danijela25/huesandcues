@@ -45,37 +45,28 @@ const ROW_LETTERS := "ABCDEFGHIJKLMNOP"
 @onready var tatada_sound=$AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer
 @onready var loser_sound=$AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer/AudioStreamPlayer
 @onready var leave_room_button= $RootMargin/HBox/RightPanel/RightMargin/RightVBox/LeaveRoom
-@onready var continue_game_button=$RootMargin/HBox/RightPanel/RightMargin/RightVBox/ContinueButton
+
 @onready var music_button=$RootMargin/HBox/RightPanel/RightMargin/RightVBox/MusicButton
 var tile_buttons: Array = []
 var guess_markers: Array = []
 var player_index_map = {}
 var player_textures = {}
-func _on_player_left_received(data):
-	Session.players = data.get("players", [])
 
-	var votes = data.get("continueVotes", [])
-	info_label.text = data.get("message", "Igrač je napustio sobu.") + " Potvrde: " + str(votes.size()) + "/" + str(Session.players.size())
-
-	continue_game_button.visible = bool(data.get("canContinue", false))
-	leave_room_button.visible = true
-
-	_refresh_ui()
 func _ready():
 	music_button.pressed.connect(_on_music_button_pressed)
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
 	get_window().content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
 	_load_player_textures()
-	continue_game_button.visible = false
+	
 	leave_room_button.visible = true
+	
 
 	if not leave_room_button.pressed.is_connected(_on_leave_room_button_pressed):
 
 		leave_room_button.pressed.connect(_on_leave_room_button_pressed)
 
-	if not continue_game_button.pressed.is_connected(_on_continue_game_button_pressed):
-		continue_game_button.pressed.connect(_on_continue_game_button_pressed)
+	
 	if not NetworkManager.player_left_received.is_connected(_on_player_left_received):
 		NetworkManager.player_left_received.connect(_on_player_left_received)
 	if not NetworkManager.secret_tile_received.is_connected(_on_secret_tile_received):
@@ -128,10 +119,14 @@ func _player_color(index: int) -> Color:
 
 func _base_tile_color(x: int, y: int) -> Color:
 	var hue := float(x) / 30.0
-	var saturation := 0.95
-	var value := 0.95 - (float(y) / 48.0)
-	if value < 0.68:
-		value = 0.68
+	var saturation := 0.45 + float(y) * 0.035
+	var value := 1.0 - float(y) * 0.025
+
+	if saturation > 0.98:
+		saturation = 0.98
+	if value < 0.60:
+		value = 0.60
+
 	return Color.from_hsv(hue, saturation, value)
 func _apply_global_visual_style():
 	var bg := ColorRect.new()
@@ -160,7 +155,7 @@ func _apply_global_visual_style():
 	_style_button(send_hint_button, Color("5b3fb1"), Color("7f5fff"))
 	_style_button(confirm_tile_button, Color("2e7dff"), Color("65a0ff"))
 	_style_button(ready_next_round_button, Color("24a46d"), Color("4be5a0"))
-	_style_button($RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox/ReplayButton, Color("5b3fb1"), Color("8a63ff"))
+	
 	_style_button($RootMargin/HBox/LeftPanel/LeftMargin/LeftVBox/FinalResultsPanel/FinalResultsVBox/ExitButton, Color("1a1a22"), Color("56566f"))
 
 	for lbl in [player_name_label, phase_label, cue_giver_label, current_player_label, hint_label, card_title_label, selected_tile_label, info_label, replay_status_label, room_code_label, sidebar_info_label, $RootMargin/HBox/RightPanel/RightMargin/RightVBox/SidebarPlayersTitle]:
@@ -185,8 +180,8 @@ func _create_board_labels():
 	for child in left_letters.get_children():
 		child.queue_free()
 
-	var tile_w := 33
-	var tile_h := 33
+	var tile_w := 31
+	var tile_h := 31
 
 	var spacer := Label.new()
 	spacer.custom_minimum_size = Vector2(32, tile_h)
@@ -218,7 +213,7 @@ func _create_grid():
 	for y in range(16):
 		for x in range(30):
 			var btn := Button.new()
-			btn.custom_minimum_size = Vector2(33, 33)
+			btn.custom_minimum_size = Vector2(31, 31)
 			btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			btn.text = ""
@@ -226,7 +221,7 @@ func _create_grid():
 			btn.add_theme_font_size_override("font_size", 9)
 			btn.add_theme_color_override("font_color", Color.WHITE)
 			_apply_tile_style(btn, x, y)
-			btn.pivot_offset = Vector2(16.5, 16.5)
+			btn.pivot_offset = Vector2(15.5, 15.5)
 			btn.mouse_entered.connect(_on_tile_mouse_entered.bind(btn))
 			btn.mouse_exited.connect(_on_tile_mouse_exited.bind(btn))
 			btn.pressed.connect(_on_tile_pressed.bind(x, y))
@@ -303,13 +298,13 @@ func _draw_badge(parent: Control, symbol: String, color: Color, idx: int):
 	sprite.scale = Vector2(scale_x, scale_y)
 
 	if idx == 0:
-		sprite.position = Vector2(16.5, 16.5)
+		sprite.position = Vector2(15.5, 15.5)
 	elif idx == 1:
-		sprite.position = Vector2(16.5, 16.5)
+		sprite.position = Vector2(15.5, 15.5)
 	elif idx == 2:
-		sprite.position = Vector2(16.5, 16.5)
+		sprite.position = Vector2(15.5, 15.5)
 	else:
-		sprite.position = Vector2(16.5, 16.5)
+		sprite.position = Vector2(15.5, 15.5)
 	parent.add_child(sprite)
 func _draw_guess_markers():
 	_clear_avatar_markers()
@@ -413,10 +408,7 @@ func _on_tile_pressed(x: int, y: int):
 		mark.position = Vector2(9, 6)
 		mark.add_theme_color_override("font_color", Color.WHITE)
 		tile_buttons[idx].add_child(mark)
-func _on_continue_game_button_pressed():
-	continue_game_button.disabled = true
-	info_label.text = "Čeka se potvrda ostalih igrača..."
-	NetworkManager.send_data({"type": "continue_after_leave"})
+
 func _on_leave_room_button_pressed():
 	NetworkManager.send_data({"type": "leave_room"})
 	Session.reset_game_state()
@@ -445,8 +437,7 @@ func _on_ready_next_round_button_pressed():
 	guess_markers.clear()
 	_clear_avatar_markers()
 	NetworkManager.send_data({"type": "next_round_ready"})
-func _on_replay_button_pressed():
-	NetworkManager.send_data({"type": "restart_game_vote"})
+
 
 func _on_exit_button_pressed():
 	guess_markers.clear()
@@ -469,8 +460,9 @@ func _show_round_result_inline():
 	round_result_panel.visible = true
 	final_results_panel.visible = false
 	round_correct_tile_label.text = "Tačna kartica: %s" % str(Session.correct_tile.get("code", ""))
-	var c = Session.correct_tile.get("color", {"r": 1.0, "g": 1.0, "b": 1.0})
-	round_color_preview.color = Color(float(c.get("r", 1.0)), float(c.get("g", 1.0)), float(c.get("b", 1.0)), 1.0)
+	var cx := int(Session.correct_tile.get("x", 0))
+	var cy := int(Session.correct_tile.get("y", 0))
+	round_color_preview.color = _base_tile_color(cx, cy)
 	next_cue_label.text = "Sledeći Cue Giver: " + Session.next_cue_giver_name
 	for child in round_scores_container.get_children():
 		child.queue_free()
@@ -497,42 +489,42 @@ func _on_round_result_received(data):
 	_pulse_scores()
 	_show_round_result_inline()
 func _on_game_over_received(data):
-	#_reset_all_tile_styles()
-	#_clear_grid_texts_only()
+	_reset_all_tile_styles()
 	_clear_avatar_markers()
-	_draw_correct_tile_matrix()
 	round_result_panel.visible = false
 	final_results_panel.visible = true
+	card_title_label.visible = false
+	color_card_panel.visible = false
+	hint_input.visible = false
+	send_hint_button.visible = false
+	confirm_tile_button.visible = false
+	selected_tile_label.visible = false
+
 	var players = data.get("players", [])
+
 	if players.size() > 0:
 		var top_score = players[0].get("score", 0)
 		var winners = []
+
 		for p in players:
 			if p.get("score", 0) == top_score:
 				winners.append(p.get("name", "Igrač"))
-		winner_label.text = "Pobednik: " + ", ".join(winners)
+
+		winner_label.text = "KRAJ PARTIJE\nPobednik: " + ", ".join(winners)
 	else:
-		winner_label.text = "Pobednik: -"
+		winner_label.text = "KRAJ PARTIJE\nPobednik: -"
+
 	for child in final_scores_container.get_children():
 		child.queue_free()
+
 	for i in range(players.size()):
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 8)
-		var chip := Label.new()
-		chip.text = str(i + 1)
-		chip.custom_minimum_size = Vector2(22, 22)
-		chip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		chip.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		chip.add_theme_color_override("font_color", Color.WHITE)
-		chip.add_theme_stylebox_override("normal", _make_stylebox(_player_color(i), Color.WHITE, 1, 999))
 		var txt := Label.new()
-		txt.text = "%s: %s" % [players[i].get("name", "Igrač"), str(players[i].get("score", 0))]
+		txt.text = "%s: %s poena" % [players[i].get("name", "Igrač"), str(players[i].get("score", 0))]
 		txt.add_theme_color_override("font_color", Color.WHITE)
-		row.add_child(chip)
-		row.add_child(txt)
-		final_scores_container.add_child(row)
-	_update_replay_status()
-	_draw_guess_markers()
+		final_scores_container.add_child(txt)
+
+	replay_status_label.text = "Možete se vratiti na početak."
+	
 
 func _on_error_received(message):
 	info_label.text = message
@@ -566,8 +558,9 @@ func _refresh_ui():
 		card_title_label.visible = true
 		color_card_panel.visible = true
 		secret_tile_label.text = "Kartica: " + str(Session.secret_tile.get("code", ""))
-		var c = Session.secret_tile.get("color", {"r": 1.0, "g": 1.0, "b": 1.0})
-		color_preview.color = Color(float(c.get("r", 1.0)), float(c.get("g", 1.0)), float(c.get("b", 1.0)), 1.0)
+		var sx := int(Session.secret_tile.get("x", 0))
+		var sy := int(Session.secret_tile.get("y", 0))
+		color_preview.color = _base_tile_color(sx, sy)
 	else:
 		card_title_label.visible = false
 		color_card_panel.visible = false
@@ -676,3 +669,14 @@ func _on_music_button_pressed():
 		music_button.text = "🔇 Muzika"
 	else:
 		music_button.text = "🔊 Mute"
+func _on_player_left_received(data):
+	var dialog = AcceptDialog.new()
+	dialog.title = "Igra prekinuta"
+	dialog.dialog_text = data.get("message", "Igrač je napustio sobu.")
+	add_child(dialog)
+	dialog.popup_centered()
+
+	await get_tree().create_timer(6.0).timeout
+
+	Session.reset_game_state()
+	get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
