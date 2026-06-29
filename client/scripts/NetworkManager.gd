@@ -12,7 +12,7 @@ signal game_over_received(data)
 signal error_received(message)
 
 var socket := WebSocketPeer.new()
-var server_url := "wss://huesandcues.onrender.com"
+var server_url := "wss://huesandcues.onrender.com" 
 var connected_flag := false
 
 func _process(_delta):

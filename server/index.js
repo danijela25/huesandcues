@@ -33,34 +33,7 @@ const wss = new WebSocket.Server({ port: PORT });
     return `${ROW_LETTERS[y]}${x + 1}`;
   }
 
-  function hsvToRgb(h, s, v) {
-    let r, g, b;
-    const i = Math.floor(h * 6);
-    const f = h * 6 - i;
-    const p = v * (1 - s);
-    const q = v * (1 - f * s);
-    const t = v * (1 - (1 - f) * s);
-    switch (i % 6) {
-      case 0: r = v; g = t; b = p; break;
-      case 1: r = q; g = v; b = p; break;
-      case 2: r = p; g = v; b = t; break;
-      case 3: r = p; g = q; b = v; break;
-      case 4: r = t; g = p; b = v; break;
-      case 5: r = v; g = p; b = q; break;
-    }
-    return { r, g, b };
-  }
-
-  function tileColor(x, y) {
-    const hue = x / 30.0;
-  let saturation = 0.45 + y * 0.035;
-  let value = 1.0 - y * 0.025;
-
-  if (saturation > 0.98) saturation = 0.98;
-  if (value < 0.60) value = 0.60;
-
-  return hsvToRgb(hue, saturation, value);
-  }
+ 
 
   function phaseLabel(phase) {
     switch (phase) {
@@ -110,16 +83,7 @@ const wss = new WebSocket.Server({ port: PORT });
     startRound(room);
   }
 
-  function resetForReplay(room) {
-    room.players.forEach((p) => {
-      p.score = 0;
-      p.ready = true;
-    });
-    room.replayVotes = [];
-    room.roundNumber = 1;
-    room.cueGiverIndex = 0;
-    startRound(room);
-  }
+ 
 
   function startRound(room) {
     room.status = "playing";
@@ -205,16 +169,21 @@ const wss = new WebSocket.Server({ port: PORT });
       const first = room.guessesFirst[player.id];
   const second = room.guessesSecond[player.id];
   let delta = 0;
-
+  let delta1=0;
+  let delta2=0;
   if (first) {
-    delta += pointsForGuess({ x: first.x, y: first.y }, room.secretTile);
+    delta1 = pointsForGuess({ x: first.x, y: first.y }, room.secretTile);
+  if (delta1 >= 2) cueBonus += 2;
   }
+
   if (second) {
-    delta += pointsForGuess({ x: second.x, y: second.y }, room.secretTile);
+    delta2 = pointsForGuess({ x: second.x, y: second.y }, room.secretTile);
+     if (delta2 >= 2) cueBonus += 2;
   }
+  delta = delta1+delta2;
       player.score += delta;
       roundScores.push({ name: player.name, delta });
-      if (delta >= 2) cueBonus += 2;
+      
     });
 
     cueGiver.score += cueBonus;
@@ -256,24 +225,20 @@ function removePlayerFromRoom(ws, disconnected = false) {
   room.players = room.players.filter(p => p.id !== ws.playerId);
   room.replayVotes = (room.replayVotes || []).filter(id => id !== ws.playerId);
 
-  if (room.players.length === 0) {
-    delete rooms[ws.roomCode];
-    return;
+  if (room.players.length > 0) {
+    if (room.hostId === ws.playerId) {
+      room.hostId = room.players[0].id;
+    }
+    broadcast(room, {
+      type: "player_left",
+      message: leavingName + " je napustio sobu.",
+      players: room.players.map(playerView),
+      hostId: room.hostId,
+    });
   }
 
-  if (room.hostId === ws.playerId) {
-    room.hostId = room.players[0].id;
-  }
-room.status = "paused_after_leave";
-room.continueVotes = [];
-  broadcast(room, {
-  type: "player_left",
-  message: leavingName + " je napustio sobu.",
-  players: room.players.map(playerView),
-  hostId: room.hostId
-});
-
-return;
+  delete rooms[ws.roomCode];
+  return;
 }
   wss.on("connection", (ws) => {
     ws.playerId = crypto.randomUUID();
@@ -335,10 +300,7 @@ return;
         return;
       }
 
-      if (data.type === "restart_game_vote") {
-        
-        return;
-      }
+    
 
       if (data.type === "next_round_ready") {
         if (room.status !== "round_result") return;
@@ -351,34 +313,6 @@ return;
         return;
       }
 
-   if (data.type === "continue_after_leave") {
-  if (room.status !== "paused_after_leave") return;
-
-  room.continueVotes = room.continueVotes || [];
-
-  if (!room.continueVotes.includes(ws.playerId)) {
-    room.continueVotes.push(ws.playerId);
-  }
-
-  broadcast(room, {
-    type: "player_left",
-    message: "Čekanje da svi potvrde nastavak.",
-    players: room.players.map(playerView),
-    hostId: room.hostId,
-    canContinue: true,
-    continueVotes: room.continueVotes
-  });
-
-  if (room.continueVotes.length < room.players.length) {
-    return;
-  }
-
-  room.status = "playing";
-  room.continueVotes = [];
-
-  startRound(room);
-  return;
-}
       if (room.status !== "playing") return;
       const cueGiver = room.players[room.cueGiverIndex];
 

@@ -491,6 +491,8 @@ func _on_round_result_received(data):
 func _on_game_over_received(data):
 	_reset_all_tile_styles()
 	_clear_avatar_markers()
+	_draw_correct_tile_matrix()
+	_flash_correct_area()
 	round_result_panel.visible = false
 	final_results_panel.visible = true
 	card_title_label.visible = false
@@ -537,9 +539,9 @@ func _refresh_ui():
 		player_index_map[p.id]=i+1
 	round_label.text = "Runda: " + str(Session.current_round)
 	phase_label.text = "Faza: " + Session.current_phase
-	hint_label.text = "Hint: " + Session.current_hint
+	hint_label.visible=false
 	var cue_name = _get_player_name(Session.cue_giver_id)
-	cue_giver_label.text = "Cue Giver: " + cue_name
+	cue_giver_label.visible=false
 	current_player_label.text = "Na potezu: " + (Session.current_guesser_name if Session.current_guesser_name != "" else "-")
 	top_banner_label.text = "CUE GIVER: " + cue_name + "   |   Hint: " + (Session.current_hint if Session.current_hint != "" else "-")
 
