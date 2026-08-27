@@ -248,9 +248,6 @@ func _reset_all_tile_styles():
 				for child in tile_buttons[idx].get_children():
 					child.queue_free()
 
-func _marker_symbol(index: int) -> String:
-	var symbols := ["1", "2", "3", "4", "5", "6"]
-	return symbols[index] if index < symbols.size() else str(index + 1)
 
 func _store_guess_markers(guesses):
 	guess_markers.clear()
@@ -280,7 +277,7 @@ func _clear_avatar_markers():
 			if child is Sprite2D:
 				child.queue_free()
 				
-func _draw_badge(parent: Control, symbol: String, color: Color, idx: int):
+func _draw_badge(parent: Control, symbol: String, idx: int):
 	var player_num_text := symbol.substr(0, symbol.length() - 1)
 	var player_num := int(player_num_text)
 
@@ -296,15 +293,7 @@ func _draw_badge(parent: Control, symbol: String, color: Color, idx: int):
 	var scale_x = target_size.x / tex_size.x
 	var scale_y = target_size.y / tex_size.y
 	sprite.scale = Vector2(scale_x, scale_y)
-
-	if idx == 0:
-		sprite.position = Vector2(15.5, 15.5)
-	elif idx == 1:
-		sprite.position = Vector2(15.5, 15.5)
-	elif idx == 2:
-		sprite.position = Vector2(15.5, 15.5)
-	else:
-		sprite.position = Vector2(15.5, 15.5)
+	sprite.position = Vector2(15.5, 15.5)
 	parent.add_child(sprite)
 func _draw_guess_markers():
 	_clear_avatar_markers()
@@ -321,7 +310,7 @@ func _draw_guess_markers():
 			var markers: Array = tile_map[key]
 
 			for i in range(markers.size()):
-				_draw_badge(btn, str(markers[i]["symbol"]), Color.WHITE, i)
+				_draw_badge(btn, str(markers[i]["symbol"]), i)
 func _clear_pending_marker():
 	for btn in tile_buttons:
 		for child in btn.get_children():
@@ -474,9 +463,6 @@ func _show_round_result_inline():
 	ready_next_round_button.visible = Session.player_id == Session.next_cue_giver_id
 	ready_next_round_button.disabled = false
 
-func _update_replay_status():
-	replay_status_label.text = "Potvrde za novu partiju: %s/%s" % [str(Session.replay_votes.size()), str(Session.players.size())]
-
 func _on_round_result_received(data):
 	_clear_pending_marker()
 	_reset_all_tile_styles()
@@ -583,7 +569,7 @@ func _refresh_ui():
 
 	_refresh_scores()
 	_refresh_sidebar_players()
-	_update_replay_status()
+	
 
 
 func _refresh_sidebar_players():

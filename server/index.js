@@ -3,13 +3,13 @@
 
 const PORT = process.env.PORT || 3000;
 const wss = new WebSocket.Server({ port: PORT });
-  const rooms = {};
+const rooms = {};
 
   const MIN_PLAYERS = 3;
   const MAX_PLAYERS = 6;
   const ROW_LETTERS = "ABCDEFGHIJKLMNOP";
-  console.log("Server radi na portu " + PORT);
- console.log("SERVER STARTED NOVA VERZIJA");
+  console.log("Najnovija verzija servera radi na portu " + PORT);
+ 
   function send(ws, data) {
     if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(data));
   }
@@ -79,7 +79,6 @@ const wss = new WebSocket.Server({ port: PORT });
     room.roundNumber = 1;
     room.maxRounds = room.players.length * 2;
     room.cueGiverIndex = 0;
-    room.replayVotes = [];
     startRound(room);
   }
 
@@ -213,25 +212,24 @@ const wss = new WebSocket.Server({ port: PORT });
       broadcast(room, {
         type: "game_over",
         players: room.players.map(playerView).sort((a, b) => b.score - a.score),
-        replayVotes: room.replayVotes || [],
+      
       });
     }
   }
-function removePlayerFromRoom(ws, disconnected = false) {
+function removePlayerFromRoom(ws) {
   const room = rooms[ws.roomCode];
   if (!room) return;
 
   const leavingName = (room.players.find(p => p.id === ws.playerId) || {}).name || "Igrač";
   room.players = room.players.filter(p => p.id !== ws.playerId);
-  room.replayVotes = (room.replayVotes || []).filter(id => id !== ws.playerId);
-
   if (room.players.length > 0) {
-    if (room.hostId === ws.playerId) {
+  //Nema potrebe da se menja hostId jer je igra prekinuta i soba se brise
+ /*   if (room.hostId === ws.playerId) {
       room.hostId = room.players[0].id;
-    }
+    }*/
     broadcast(room, {
       type: "player_left",
-      message: leavingName + " je napustio sobu.",
+      message: leavingName + " je napustio sobu. Igra je prekinuta",
       players: room.players.map(playerView),
       hostId: room.hostId,
     });
@@ -255,7 +253,7 @@ function removePlayerFromRoom(ws, disconnected = false) {
           hostId: ws.playerId,
           status: "lobby",
           players: [{ id: ws.playerId, name: data.playerName || "Igrač", ready: false, score: 0, ws }],
-          replayVotes: [],
+          
         };
         rooms[code] = room;
         ws.roomCode = code;
@@ -279,7 +277,7 @@ function removePlayerFromRoom(ws, disconnected = false) {
       const room = rooms[ws.roomCode];
       if (!room) return;
       if (data.type === "leave_room") {
-         removePlayerFromRoom(ws, false);
+         removePlayerFromRoom(ws);
           return;
         }
 
@@ -333,18 +331,18 @@ function removePlayerFromRoom(ws, disconnected = false) {
           room.guessOrder = buildGuessOrder(room, true);
           room.phase = "second_guess";
         }
-         console.log("PHASE AFTER HINT:", room.phase);
+       //  console.log("PHASE AFTER HINT:", room.phase);
         broadcastState(room);
         return;
       }
 
       if (data.type === "select_tile") {
-        console.log("SELECT_TILE", {
-  phase: room.phase,
-  playerId: ws.playerId,
-  tileX: data.tileX,
-  tileY: data.tileY
-});
+      //  console.log("SELECT_TILE", {
+//  phase: room.phase,
+ // playerId: ws.playerId,
+ // tileX: data.tileX,
+ // tileY: data.tileY
+//});
         if (ws.playerId === cueGiver.id) return;
         if (!(room.phase === "first_guess" || room.phase === "second_guess")) return;
         const activeGuesser = currentGuesser(room);
@@ -352,7 +350,18 @@ function removePlayerFromRoom(ws, disconnected = false) {
         const player = room.players.find((p) => p.id === ws.playerId);
         if (!player) return;
         const tileX = Number(data.tileX);
-  const tileY = Number(data.tileY);
+        const tileY = Number(data.tileY);
+        if (
+    !Number.isInteger(tileX) ||
+    !Number.isInteger(tileY) ||
+    tileX < 0 || tileX >= 30 ||
+    tileY < 0 || tileY >= 16
+) {
+    return send(ws, {
+        type: "error",
+        message: "Neispravno polje"
+    });
+}
 
   const allGuesses = [
     ...Object.values(room.guessesFirst || {}),
@@ -382,16 +391,16 @@ function removePlayerFromRoom(ws, disconnected = false) {
             return;
           }
         }
-        console.log("GUESSES_FIRST", room.guessesFirst);
-console.log("GUESSES_SECOND", room.guessesSecond);
+     //   console.log("GUESSES_FIRST", room.guessesFirst);
+//console.log("GUESSES_SECOND", room.guessesSecond);
         broadcastState(room);
         return;
       }
     });
 
     ws.on("close", () => {
-      removePlayerFromRoom(ws, true);
+      removePlayerFromRoom(ws);
     });
   });
 
-  console.log("Server radi na ws://127.0.0.1:3000");
+  
