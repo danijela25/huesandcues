@@ -1,5 +1,5 @@
 63f7b34db8d8cdea90c76aacccf841ec
-::res://::1787656977
+::res://::1787818934
 default_bus_layout.tres::AudioBusLayout::5731788206490693129::1776166066::0::1::::<><><>0<>0<><>::
 export_presets.cfg::TextFile::-1::1782739215::0::1::::<><><>0<>0<><>::
 ::res://assets/::1776767170
@@ -19,15 +19,15 @@ PlayerOrange.png::CompressedTexture2D::7521077541294355864::1776768198::17767681
 PlayerPink.png::CompressedTexture2D::4950261301067671519::1776768198::1776768198::1::::<><><>0<>0<>045b9339f3485d06bf6210efea5a0fe6<>res://.godot/imported/PlayerPink.png-9a81ba4b24ec29ceea9fcc324749bb2f.ctex::
 PlayerPurple.png::CompressedTexture2D::8529856801431058360::1776768198::1776768198::1::::<><><>0<>0<>ad5d6d7e240eab30c21f31fd8313b3a9<>res://.godot/imported/PlayerPurple.png-f42334c6e22d76d81f0891e339d672d3.ctex::
 PlayerRed.png::CompressedTexture2D::3128997605478600757::1776768198::1776768198::1::::<><><>0<>0<>772c42f16390ec0582a2ae6a93e86185<>res://.godot/imported/PlayerRed.png-03474662b3a78124d11fdc79ca645d79.ctex::
-::res://scenes/::1787509154
+::res://scenes/::1787657641
 dd5b468f-a164-45a1-b333-392825f7d3bb.jpg::CompressedTexture2D::1739134341572126961::1775566074::1775566076::1::::<><><>0<>0<>62cbba33c7b3ab6a5cf6273e94611a72<>res://.godot/imported/dd5b468f-a164-45a1-b333-392825f7d3bb.jpg-e5255f906f52cf613fe6ee8ea128fee5.ctex::
 Game.tscn::PackedScene::3337527170285319498::1782739079::0::1::::<><><>0<>0<><>::uid://bj1kmtpubi2kf::::res://scripts/Game.gd<>uid://y1pj2r17x7yj::::res://scenes/dd5b468f-a164-45a1-b333-392825f7d3bb.jpg<>uid://cvk8cu6oqoomm::::res://assets/audio/music/Walen - Gameboy (freetouse.com).mp3<>uid://dhhlolx7iueu6::::res://assets/audio/sfx/sound.wav<>uid://cnmysr4j74akw::::res://assets/audio/sfx/celebration-knuckles.mp3<>uid://bdnxw2vbbv4cl::::res://assets/audio/sfx/tadaaa.mp3<>uid://thtql72h2dpc::::res://assets/audio/sfx/thepriceisright-loserhorns_1.mp3
 Lobby.tscn::PackedScene::599081758712631520::1779199368::0::1::::<><><>0<>0<><>::uid://d217f5rro673f::::res://scripts/Lobby.gd<>uid://y1pj2r17x7yj::::res://scenes/dd5b468f-a164-45a1-b333-392825f7d3bb.jpg<>uid://bbowm65q6omht::::res://scenes/Super Starfish.ttf<>uid://nvmqn0vne61t::::res://assets/audio/music/Filo Starquez - The Shack (freetouse.com).mp3
-MainMenu.tscn::PackedScene::4978774018111899911::1787509154::0::1::::<><><>0<>0<><>::uid://d36v2665dutlb::::res://scripts/MainMenu.gd<>uid://y1pj2r17x7yj::::res://scenes/dd5b468f-a164-45a1-b333-392825f7d3bb.jpg<>uid://bbowm65q6omht::::res://scenes/Super Starfish.ttf<>uid://nvmqn0vne61t::::res://assets/audio/music/Filo Starquez - The Shack (freetouse.com).mp3
+MainMenu.tscn::PackedScene::4978774018111899911::1787657641::0::1::::<><><>0<>0<><>::uid://d36v2665dutlb::::res://scripts/MainMenu.gd<>uid://y1pj2r17x7yj::::res://scenes/dd5b468f-a164-45a1-b333-392825f7d3bb.jpg<>uid://bbowm65q6omht::::res://scenes/Super Starfish.ttf<>uid://nvmqn0vne61t::::res://assets/audio/music/Filo Starquez - The Shack (freetouse.com).mp3
 RoundResult.tscn::PackedScene::-1::1775513936::0::1::::<><><>0<>0<><>::res://scripts/RoundResult.gd
 Super Starfish.ttf::FontFile::2486869694592635793::1775566754::1775566755::1::::<><><>0<>0<>4659d80330cc0dcf51ed7867243d73bb<>res://.godot/imported/Super Starfish.ttf-9ee0362bfd4bf6b84f55fb5b3a70fdd2.fontdata::
-::res://scripts/::1787509154
-Game.gd::GDScript::3072423719521579861::1782739079::0::1::::<>Control<><>0<>0<><>::
+::res://scripts/::1787657641
+Game.gd::GDScript::3072423719521579861::1787657641::0::1::::<>Control<><>0<>0<><>::
 Lobby.gd::GDScript::9109988126404329717::1779199368::0::1::::<>Control<><>0<>0<><>::
 MainMenu.gd::GDScript::9189870334084262419::1782207766::0::1::::<>Control<><>0<>0<><>::
 NetworkManager.gd::GDScript::8664728597950770408::1787509154::0::1::::<>Node<><>0<>0<><>::
