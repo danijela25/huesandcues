@@ -1,7 +1,7 @@
 63f7b34db8d8cdea90c76aacccf841ec
-::res://::1787818934
+::res://::1788088076
 default_bus_layout.tres::AudioBusLayout::5731788206490693129::1776166066::0::1::::<><><>0<>0<><>::
-export_presets.cfg::TextFile::-1::1782739215::0::1::::<><><>0<>0<><>::
+export_presets.cfg::TextFile::-1::1788088076::0::1::::<><><>0<>0<><>::
 ::res://assets/::1776767170
 ::res://assets/audio/::1776166155
 ::res://assets/audio/music/::1776175245
@@ -19,24 +19,26 @@ PlayerOrange.png::CompressedTexture2D::7521077541294355864::1776768198::17767681
 PlayerPink.png::CompressedTexture2D::4950261301067671519::1776768198::1776768198::1::::<><><>0<>0<>045b9339f3485d06bf6210efea5a0fe6<>res://.godot/imported/PlayerPink.png-9a81ba4b24ec29ceea9fcc324749bb2f.ctex::
 PlayerPurple.png::CompressedTexture2D::8529856801431058360::1776768198::1776768198::1::::<><><>0<>0<>ad5d6d7e240eab30c21f31fd8313b3a9<>res://.godot/imported/PlayerPurple.png-f42334c6e22d76d81f0891e339d672d3.ctex::
 PlayerRed.png::CompressedTexture2D::3128997605478600757::1776768198::1776768198::1::::<><><>0<>0<>772c42f16390ec0582a2ae6a93e86185<>res://.godot/imported/PlayerRed.png-03474662b3a78124d11fdc79ca645d79.ctex::
-::res://scenes/::1787657641
+::res://scenes/::1788086721
 dd5b468f-a164-45a1-b333-392825f7d3bb.jpg::CompressedTexture2D::1739134341572126961::1775566074::1775566076::1::::<><><>0<>0<>62cbba33c7b3ab6a5cf6273e94611a72<>res://.godot/imported/dd5b468f-a164-45a1-b333-392825f7d3bb.jpg-e5255f906f52cf613fe6ee8ea128fee5.ctex::
 Game.tscn::PackedScene::3337527170285319498::1782739079::0::1::::<><><>0<>0<><>::uid://bj1kmtpubi2kf::::res://scripts/Game.gd<>uid://y1pj2r17x7yj::::res://scenes/dd5b468f-a164-45a1-b333-392825f7d3bb.jpg<>uid://cvk8cu6oqoomm::::res://assets/audio/music/Walen - Gameboy (freetouse.com).mp3<>uid://dhhlolx7iueu6::::res://assets/audio/sfx/sound.wav<>uid://cnmysr4j74akw::::res://assets/audio/sfx/celebration-knuckles.mp3<>uid://bdnxw2vbbv4cl::::res://assets/audio/sfx/tadaaa.mp3<>uid://thtql72h2dpc::::res://assets/audio/sfx/thepriceisright-loserhorns_1.mp3
 Lobby.tscn::PackedScene::599081758712631520::1779199368::0::1::::<><><>0<>0<><>::uid://d217f5rro673f::::res://scripts/Lobby.gd<>uid://y1pj2r17x7yj::::res://scenes/dd5b468f-a164-45a1-b333-392825f7d3bb.jpg<>uid://bbowm65q6omht::::res://scenes/Super Starfish.ttf<>uid://nvmqn0vne61t::::res://assets/audio/music/Filo Starquez - The Shack (freetouse.com).mp3
-MainMenu.tscn::PackedScene::4978774018111899911::1787657641::0::1::::<><><>0<>0<><>::uid://d36v2665dutlb::::res://scripts/MainMenu.gd<>uid://y1pj2r17x7yj::::res://scenes/dd5b468f-a164-45a1-b333-392825f7d3bb.jpg<>uid://bbowm65q6omht::::res://scenes/Super Starfish.ttf<>uid://nvmqn0vne61t::::res://assets/audio/music/Filo Starquez - The Shack (freetouse.com).mp3
-RoundResult.tscn::PackedScene::-1::1775513936::0::1::::<><><>0<>0<><>::res://scripts/RoundResult.gd
+MainMenu.tscn::PackedScene::4978774018111899911::1788086721::0::1::::<><><>0<>0<><>::uid://d36v2665dutlb::::res://scripts/MainMenu.gd<>uid://y1pj2r17x7yj::::res://scenes/dd5b468f-a164-45a1-b333-392825f7d3bb.jpg<>uid://bbowm65q6omht::::res://scenes/Super Starfish.ttf<>uid://nvmqn0vne61t::::res://assets/audio/music/Filo Starquez - The Shack (freetouse.com).mp3
+RoundResult.tscn::PackedScene::5800141823506708855::1787819023::0::1::::<><><>0<>0<><>::
 Super Starfish.ttf::FontFile::2486869694592635793::1775566754::1775566755::1::::<><><>0<>0<>4659d80330cc0dcf51ed7867243d73bb<>res://.godot/imported/Super Starfish.ttf-9ee0362bfd4bf6b84f55fb5b3a70fdd2.fontdata::
-::res://scripts/::1787657641
-Game.gd::GDScript::3072423719521579861::1787657641::0::1::::<>Control<><>0<>0<><>::
+::res://scripts/::1788086721
+Game.gd::GDScript::3072423719521579861::1788009543::0::1::::<>Control<><>0<>0<><>::
 Lobby.gd::GDScript::9109988126404329717::1779199368::0::1::::<>Control<><>0<>0<><>::
-MainMenu.gd::GDScript::9189870334084262419::1782207766::0::1::::<>Control<><>0<>0<><>::
-NetworkManager.gd::GDScript::8664728597950770408::1787509154::0::1::::<>Node<><>0<>0<><>::
-RoundResult.gd::GDScript::4057661502115898136::1775513936::0::1::::<>Control<><>0<>0<><>::
-Session.gd::GDScript::4277151320796808406::1782206260::0::1::::<>Node<><>0<>0<><>::
-::res://WEB/::1787509044
+MainMenu.gd::GDScript::9189870334084262419::1788085142::0::1::::<>Control<><>0<>0<><>::
+NetworkManager.gd::GDScript::8664728597950770408::1788086721::0::1::::<>Node<><>0<>0<><>::
+Session.gd::GDScript::4277151320796808406::1788006947::0::1::::<>Node<><>0<>0<><>::
+::res://WEB/::1788088075
 HuesandCuesMVPNadogradjen.apple-touch-icon.png::CompressedTexture2D::7233442972056317112::1782739214::1787509044::1::::<><><>0<>0<>317343c2f8492ac5a9f055def90dfe8c<>res://.godot/imported/HuesandCuesMVPNadogradjen.apple-touch-icon.png-b64de234ee47006ad73db6dddbca8833.ctex::
 HuesandCuesMVPNadogradjen.icon.png::CompressedTexture2D::7128488572561136390::1782739214::1787509044::1::::<><><>0<>0<>09e8b6ada7225d7f6efba5e44cb502f2<>res://.godot/imported/HuesandCuesMVPNadogradjen.icon.png-d4a1e5d5baeb3d2360725b948fc75bf9.ctex::
 HuesandCuesMVPNadogradjen.png::CompressedTexture2D::1262641457418918951::1782739214::1787509044::1::::<><><>0<>0<>b9e79f19bebb36feffb8e01c7b244235<>res://.godot/imported/HuesandCuesMVPNadogradjen.png-75fb6379d7a99bf2fbb551e96d9ff83b.ctex::
+index.apple-touch-icon.png::CompressedTexture2D::5791263705559739043::1788088075::1788088000::1::::<><><>0<>0<>f2a90de0f5bd8e89fd9ed51ec1459519<>res://.godot/imported/index.apple-touch-icon.png-a2277392fdcf07f0bab1b1077294fa2a.ctex::
+index.icon.png::CompressedTexture2D::827893809101966692::1788088075::1788088088::1::::<><><>0<>0<>dfdf79bd861590ace89084663e1831c4<>res://.godot/imported/index.icon.png-9a4bbdec58e72dd20db217cd020bb691.ctex::
+index.png::CompressedTexture2D::1879522716044187806::1788088075::1788088000::1::::<><><>0<>0<>257af3239bea370cb90ab01ab14504b9<>res://.godot/imported/index.png-2a744f20d538e21680a5f784594a6ec4.ctex::
 ::res://web2/::1782730090
 HuesandCuesMVPNadogradjen.apple-touch-icon.png::CompressedTexture2D::2318447641130522533::1782233424::1782730090::1::::<><><>0<>0<>f9d86a661dc9850518561b63e1128165<>res://.godot/imported/HuesandCuesMVPNadogradjen.apple-touch-icon.png-34d65881b85e78b39a79a569cd5df579.ctex::
 HuesandCuesMVPNadogradjen.icon.png::CompressedTexture2D::1600991141364707652::1782233424::1782730090::1::::<><><>0<>0<>dc91e3340d19c1c2012bdbc9b13e7cab<>res://.godot/imported/HuesandCuesMVPNadogradjen.icon.png-54a5ebeacac8c8080911f5548b2eab7b.ctex::

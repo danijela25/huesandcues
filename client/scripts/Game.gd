@@ -51,6 +51,7 @@ var tile_buttons: Array = []
 var guess_markers: Array = []
 var player_index_map = {}
 var player_textures = {}
+var game_frozen := false
 
 func _ready():
 	music_button.pressed.connect(_on_music_button_pressed)
@@ -79,6 +80,14 @@ func _ready():
 		NetworkManager.game_over_received.connect(_on_game_over_received)
 	if not NetworkManager.error_received.is_connected(_on_error_received):
 		NetworkManager.error_received.connect(_on_error_received)
+	if not NetworkManager.disconnected.is_connected(_on_network_disconnected):
+		NetworkManager.disconnected.connect(_on_network_disconnected)
+	if not NetworkManager.game_frozen.is_connected(_on_game_frozen):
+		NetworkManager.game_frozen.connect(_on_game_frozen)
+	if not NetworkManager.game_resumed.is_connected(_on_game_resumed):
+		NetworkManager.game_resumed.connect(_on_game_resumed)
+	if not NetworkManager.reconnect_failed.is_connected(_on_reconnect_failed):
+		NetworkManager.reconnect_failed.connect(_on_reconnect_failed)
 
 	_apply_global_visual_style()
 	_create_board_labels()
@@ -378,6 +387,8 @@ func _flash_correct_area():
 				tween.tween_property(btn, "modulate", Color.WHITE, 0.22)
 
 func _on_tile_pressed(x: int, y: int):
+	if game_frozen:
+		return
 	var is_cue_giver := Session.player_id == Session.cue_giver_id
 	if is_cue_giver:
 		return
@@ -403,6 +414,8 @@ func _on_leave_room_button_pressed():
 	Session.reset_game_state()
 	get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
 func _on_confirm_tile_button_pressed():
+	if game_frozen:
+		return
 	if Session.pending_tile_x < 0 or Session.pending_tile_y < 0:
 		return
 	NetworkManager.send_data({"type": "select_tile", "tileX": Session.pending_tile_x, "tileY": Session.pending_tile_y})
@@ -413,6 +426,8 @@ func _on_confirm_tile_button_pressed():
 	confirm_tile_button.visible = false
 
 func _on_send_hint_button_pressed():
+	if game_frozen:
+		return
 	var hint := hint_input.text.strip_edges()
 	if hint == "":
 		return
@@ -442,9 +457,16 @@ func _on_state_updated(data):
 	round_result_panel.visible = false
 	_refresh_ui()
 
+	if Session.current_hint == "Bez hinta - vreme je isteklo":
+		if Session.current_guesser_id == Session.player_id:
+			info_label.text = "Vreme za hint je isteklo. Ti si na potezu!"
+		elif Session.current_phase == "Prvo pogađanje" or Session.current_phase == "Drugo pogađanje":
+			info_label.text = "Vreme za hint je isteklo. Čekaj svoj red."
+
 	if data.has("guesses"):
 		_store_guess_markers(data.get("guesses", []))
 		_draw_guess_markers()
+
 func _show_round_result_inline():
 	round_result_panel.visible = true
 	final_results_panel.visible = false
@@ -668,3 +690,36 @@ func _on_player_left_received(data):
 
 	Session.reset_game_state()
 	get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
+func _on_network_disconnected():
+	game_frozen = true
+	info_label.text = \
+	"Veza je izgubljena. Pokušavamo ponovno povezivanje..."
+	hint_input.editable = false
+	send_hint_button.disabled = true
+	confirm_tile_button.disabled = true
+func _on_game_frozen(data):
+	game_frozen = true
+	info_label.text = data.get(
+		"message",
+		"Igra je pauzirana zbog gubitka konekcije.")
+	hint_input.editable = false
+	send_hint_button.disabled = true
+	confirm_tile_button.disabled = true
+func _on_game_resumed(data):
+	game_frozen = false
+	info_label.text = data.get(
+		"message",
+		"Igra se nastavlja.")
+	_refresh_ui()
+func _on_reconnect_failed(message):
+	game_frozen = false
+	var dialog = AcceptDialog.new()
+	dialog.title = "Konekcija izgubljena"
+	dialog.dialog_text = message
+	add_child(dialog)
+	dialog.popup_centered()
+	await get_tree().create_timer(3.0).timeout
+	Session.reset_game_state()
+	get_tree().change_scene_to_file(
+        "res://scenes/MainMenu.tscn"
+	)
