@@ -531,7 +531,8 @@ function finishRound(room) {
       reconnectSeconds: 120,
       message:
         player.name +
-        " je napustio/la sobu. Čekamo 2 minuta da se vrati..."
+        " je napustio/la sobu.\n" +
+        "Čekamo 2 minuta da se vrati..."
     });
 
     // Pokreni reconnect timer od 2 minuta
